@@ -7,13 +7,29 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+/**
+ * Repository interface for User entities.
+ * Provides methods to perform CRUD operations and custom queries on User entities.
+ */
 @Repository
-public interface UserRepository extends JpaRepository<User, Integer> {
+public interface UserRepository extends JpaRepository<User, Long> {
 
-    @Query("SELECT user FROM User user WHERE user.id.email=?1")
+    /**
+     * Finds a user by their email address.
+     *
+     * @param email the email address of the user to find
+     * @return an Optional containing the found user, or empty if no user was found
+     */
+    @Query("SELECT user FROM User user WHERE user.email=?1")
     Optional<User> findUserByEmail(String email);
 
-    @Query("SELECT user FROM User user WHERE user.id.username=?1")
+    /**
+     * Finds a user by their username.
+     *
+     * @param username the username of the user to find
+     * @return an Optional containing the found user, or empty if no user was found
+     */
+    @Query("SELECT user FROM User user WHERE user.username=?1")
     Optional<User> findUserByUsername(String username);
 
 }
