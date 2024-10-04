@@ -1,27 +1,35 @@
 package com.intheknowyyc.api.services;
+
+import com.intheknowyyc.api.controllers.requests.UserRequest;
 import com.intheknowyyc.api.data.models.User;
+import com.intheknowyyc.api.data.models.UserRole;
 import com.intheknowyyc.api.data.repositories.UserRepository;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestBody;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+
+import static com.intheknowyyc.api.utils.Constants.*;
 
 /**
  * Service class for managing User entities.
  * Provides methods to perform CRUD operations on User entities.
  */
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
-    /**
-     * Constructs a new UserService with the given UserRepository.
-     *
-     * @param userRepository the UserRepository to use for data access
-     */
+    BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(4);
+
     @Autowired
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -43,49 +51,52 @@ public class UserService {
      * @return the user with the given ID
      * @throws IllegalStateException if no user with the given ID exists
      */
-    public User getUserById(long userId) {
-        return userRepository.findById(userId).orElseThrow(() -> new IllegalStateException("User with " + userId + " does not exist!"));
+    public User getUserById(int userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new IllegalStateException(String.format(USER_NOT_FOUND_BY_ID, userId)));
     }
 
     /**
-     * Creates a new user in the repository.
+     * Registers a new user in the repository.
      *
-     * @param user the user to create
-     * @throws IllegalStateException if a user with the same email or username already exists
+     * @param request the user data to register
+     * @throws IllegalStateException if a user with the given email already exists
      */
-    public void createNewUser(User user) {
-        if (userRepository.findUserByEmail(user.getEmail()).isEmpty() || userRepository.findUserByUsername(user.getUsername()).isEmpty()){
-            userRepository.save(user);
+    public void registerNewUser(@RequestBody UserRequest request) {
+        if (userRepository.findUserByEmail(request.getEmail()).isPresent()) {
+            throw new IllegalStateException("User with this email already exists.");
         } else {
-            throw new IllegalStateException("User with this email or username already exists!");
+            User user = new User();
+            user.setEmail(request.getEmail());
+            user.setPassword_hash(passwordEncoder.encode(request.getPassword()));
+            user.setFull_name(request.getFull_name());
+            user.setCreated_at(LocalDateTime.now());
+            user.setUpdated_at(LocalDateTime.now());
+            user.setRole(UserRole.USER);
+            userRepository.save(user);
         }
     }
 
     /**
-     * Updates an existing user in the repository.
+     * Updates an existing user with the provided details.
      *
      * @param userId the ID of the user to update
-     * @param password_hash the new password hash for the user
-     * @param full_name the new full name for the user
+     * @param request the updated user data
      * @throws IllegalStateException if no user with the given ID exists
      */
     @Transactional
-    public void updateUser(
-            long userId,
-            String password_hash,
-            String full_name
+    public void updateUser(int userId, @Valid UserRequest request
     ) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalStateException("User with ID " + userId + " does not exist!"));
-        if (full_name != null &&
-                !full_name.isEmpty() &&
-                !Objects.equals(user.getFull_name(), full_name)) {
-            user.setFull_name(full_name);
+                .orElseThrow(() ->
+                        new IllegalStateException(String.format(USER_NOT_FOUND_BY_ID, userId)));
+        if(!request.getEmail().isBlank() && !Objects.equals(request.getEmail(), user.getEmail())){
+            user.setEmail(request.getEmail());
         }
-        if (password_hash != null &&
-                !password_hash.isEmpty() &&
-                !Objects.equals(user.getPassword_hash(), password_hash)) {
-            user.setPassword_hash(password_hash);
+        if(!request.getPassword().isBlank() && !Objects.equals(request.getPassword(), user.getPassword_hash())){
+            user.setPassword_hash(passwordEncoder.encode(request.getPassword()));
+        }
+        if (!request.getFull_name().isBlank() && !Objects.equals(request.getFull_name(), user.getFull_name())){
+            user.setFull_name(request.getFull_name());
         }
         user.setUpdated_at(LocalDateTime.now());
     }
@@ -96,11 +107,26 @@ public class UserService {
      * @param userId the ID of the user to delete
      * @throws IllegalStateException if no user with the given ID exists
      */
-    public void deleteUser(long userId) {
+    public void deleteUser(int userId) {
         if (userRepository.existsById(userId)){
             userRepository.deleteById(userId);
         } else {
-            throw new IllegalStateException("User with ID" + userId + " does not exist!");
+            throw new IllegalStateException(String.format(USER_NOT_FOUND_BY_ID, userId));
         }
     }
+
+    /**
+     * Loads a user by their email address.
+     *
+     * @param email the email address of the user to load
+     * @return the user with the given email address
+     * @throws UsernameNotFoundException if no user with the given email address exists
+     */
+    @Override
+    public User loadUserByUsername(String email) throws UsernameNotFoundException {
+        return userRepository.findUserByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException(String.format(USER_NOT_FOUND_BY_EMAIL, email)));
+    }
+
+
 }
