@@ -69,14 +69,4 @@ public class UserController {
         userService.updateUser(userId, request);
     }
 
-    /**
-     * Deletes a user by their ID.
-     *
-     * @param userId the ID of the user to delete
-     */
-    @DeleteMapping(path = "/{userId}")
-    public void deleteUser(@PathVariable("userId") int userId) {
-        userService.deleteUser(userId);
-    }
-
 }

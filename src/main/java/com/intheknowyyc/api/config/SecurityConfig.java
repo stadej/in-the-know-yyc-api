@@ -48,8 +48,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(
                         authorize ->
                                 authorize
-                                        .requestMatchers(HttpMethod.GET).permitAll()
-                                        .requestMatchers(HttpMethod.POST).hasRole("ADMIN")
+                                        .requestMatchers(HttpMethod.GET, "/users").hasAuthority("ADMIN")
+                                        .requestMatchers(HttpMethod.GET, "/events").permitAll()
+                                        .requestMatchers(HttpMethod.POST).permitAll()
                                         .anyRequest()
                                         .authenticated())
                 .formLogin(withDefaults())

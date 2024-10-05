@@ -67,10 +67,10 @@ public class UserService implements UserDetailsService {
         } else {
             User user = new User();
             user.setEmail(request.getEmail());
-            user.setPassword_hash(passwordEncoder.encode(request.getPassword()));
-            user.setFull_name(request.getFull_name());
-            user.setCreated_at(LocalDateTime.now());
-            user.setUpdated_at(LocalDateTime.now());
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
+            user.setFullName(request.getFullName());
+            user.setCreatedAt(LocalDateTime.now());
+            user.setUpdatedAt(LocalDateTime.now());
             user.setRole(UserRole.USER);
             userRepository.save(user);
         }
@@ -92,27 +92,13 @@ public class UserService implements UserDetailsService {
         if(!request.getEmail().isBlank() && !Objects.equals(request.getEmail(), user.getEmail())){
             user.setEmail(request.getEmail());
         }
-        if(!request.getPassword().isBlank() && !Objects.equals(request.getPassword(), user.getPassword_hash())){
-            user.setPassword_hash(passwordEncoder.encode(request.getPassword()));
+        if(!request.getPassword().isBlank() && !Objects.equals(request.getPassword(), user.getPassword())){
+            user.setPassword(passwordEncoder.encode(request.getPassword()));
         }
-        if (!request.getFull_name().isBlank() && !Objects.equals(request.getFull_name(), user.getFull_name())){
-            user.setFull_name(request.getFull_name());
+        if (!request.getFullName().isBlank() && !Objects.equals(request.getFullName(), user.getFullName())){
+            user.setFullName(request.getFullName());
         }
-        user.setUpdated_at(LocalDateTime.now());
-    }
-
-    /**
-     * Deletes a user by their ID.
-     *
-     * @param userId the ID of the user to delete
-     * @throws IllegalStateException if no user with the given ID exists
-     */
-    public void deleteUser(int userId) {
-        if (userRepository.existsById(userId)){
-            userRepository.deleteById(userId);
-        } else {
-            throw new IllegalStateException(String.format(USER_NOT_FOUND_BY_ID, userId));
-        }
+        user.setUpdatedAt(LocalDateTime.now());
     }
 
     /**

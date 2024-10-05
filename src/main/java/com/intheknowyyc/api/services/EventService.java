@@ -55,13 +55,13 @@ public class EventService {
      * @param event the event to create
      */
     public void createNewEvent(@Valid Event event) {
-        if (event.getIs_event_free() && event.getEvent_cost().compareTo(BigDecimal.ZERO) != 0) {
+        if (event.getIsEventFree() && event.getEventCost().compareTo(BigDecimal.ZERO) != 0) {
             throw new IllegalStateException("Event cost must be zero for free events.");
-        } else if (!event.getIs_event_free() && event.getEvent_cost().compareTo(BigDecimal.ZERO) <= 0) {
+        } else if (!event.getIsEventFree() && event.getEventCost().compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalStateException("Event cost must be greater than zero for paid events.");
         }
-        event.setCreated_at(LocalDateTime.now());
-        event.setUpdated_at(LocalDateTime.now());
+        event.setCreatedAt(LocalDateTime.now());
+        event.setUpdatedAt(LocalDateTime.now());
         eventRepository.save(event);
     }
 
@@ -79,32 +79,32 @@ public class EventService {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() ->
                         new IllegalStateException(String.format(EVENT_NOT_FOUND_BY_ID, eventId)));
-        if(!Objects.equals(request.getOrganization_name(), event.getOrganization_name())) {
-            event.setOrganization_name(request.getOrganization_name());
+        if(!Objects.equals(request.getOrganizationName(), event.getOrganizationName())) {
+            event.setOrganizationName(request.getOrganizationName());
         }
-        if (!Objects.equals(request.getEvent_name(), event.getEvent_name())) {
-            event.setEvent_name(request.getEvent_name());
+        if (!Objects.equals(request.getEventName(), event.getEventName())) {
+            event.setEventName(request.getEventName());
         }
-        if (!Objects.equals(request.getEvent_description(), event.getEvent_description())) {
-            event.setEvent_description(request.getEvent_description());
+        if (!Objects.equals(request.getEventDescription(), event.getEventDescription())) {
+            event.setEventDescription(request.getEventDescription());
         }
-        if (!Objects.equals(request.getEvent_date(), event.getEvent_date())) {
-            event.setEvent_date(request.getEvent_date());
+        if (!Objects.equals(request.getEventDate(), event.getEventDate())) {
+            event.setEventDate(request.getEventDate());
         }
-        event.setIs_event_free(request.getIs_event_free());
-        event.setEvent_cost(request.getEvent_cost());
-        if (event.getIs_event_free() && event.getEvent_cost().compareTo(BigDecimal.ZERO) != 0) {
+        event.setIsEventFree(request.getIsEventFree());
+        event.setEventCost(request.getEventCost());
+        if (event.getIsEventFree() && event.getEventCost().compareTo(BigDecimal.ZERO) != 0) {
             throw new IllegalStateException("Event cost must be zero for free events.");
-        } else if (!event.getIs_event_free() && event.getEvent_cost().compareTo(BigDecimal.ZERO) <= 0) {
+        } else if (!event.getIsEventFree() && event.getEventCost().compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalStateException("Event cost must be greater than zero for paid events.");
         }
-        if (!Objects.equals(request.getEvent_link(), event.getEvent_link())) {
-            event.setEvent_link(request.getEvent_link());
+        if (!Objects.equals(request.getEventLink(), event.getEventLink())) {
+            event.setEventLink(request.getEventLink());
         }
-        if (!Objects.equals(request.getEvent_type(), event.getEvent_type())) {
-            event.setEvent_type(request.getEvent_type());
+        if (!Objects.equals(request.getEventType(), event.getEventType())) {
+            event.setEventType(request.getEventType());
         }
-        event.setUpdated_at(LocalDateTime.now());
+        event.setUpdatedAt(LocalDateTime.now());
         eventRepository.save(event);
     }
 

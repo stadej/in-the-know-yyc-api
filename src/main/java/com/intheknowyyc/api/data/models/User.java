@@ -48,30 +48,39 @@ public class User implements Serializable, UserDetails {
      */
     @Column(nullable = false)
     @NotBlank(message = "Please provide a password")
-    private String password_hash;
+    private String password;
 
     /**
      * The full name of the user.
      */
-    @Column(length = 100)
+    @Column(
+            name = "full_name",
+            length = 100
+    )
     @NotBlank(message = "Please provide a full name")
-    private String full_name;
+    private String fullName;
 
     /**
      * The timestamp when the user was created.
      */
-    private LocalDateTime created_at;
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
     /**
      * The timestamp when the user was last updated.
      */
-    private LocalDateTime updated_at;
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    private boolean locked;
+
+    private boolean expired;
 
     /**
      * The list of events associated with the user.
      * This is a one-to-many relationship where one user can have multiple events.
      */
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "user")
     @JsonIgnore
     private List<Event> events;
 
@@ -97,7 +106,7 @@ public class User implements Serializable, UserDetails {
      */
     @Override
     public String getPassword() {
-        return password_hash;
+        return password;
     }
 
     /**
@@ -115,7 +124,7 @@ public class User implements Serializable, UserDetails {
      */
     @Override
     public boolean isAccountNonExpired() {
-        return true;
+        return !expired;
     }
 
     /**
@@ -124,7 +133,7 @@ public class User implements Serializable, UserDetails {
      */
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return !locked;
     }
 
     /**

@@ -29,9 +29,12 @@ public class Event implements Serializable {
      * Name of the organization hosting the event.
      * Maximum length is 100 characters.
      */
-    @Column(length = 100)
+    @Column(
+            name = "organization_name",
+            length = 100
+    )
     @NotBlank(message = "Please provide an organization name")
-    private String organization_name;
+    private String organizationName;
 
     /**
      * Name of the event.
@@ -39,11 +42,12 @@ public class Event implements Serializable {
      * Cannot be null.
      */
     @Column(
+            name = "event_name",
             length = 100,
             nullable = false
     )
     @NotBlank(message = "Please provide an event name")
-    private String event_name;
+    private String eventName;
 
     /**
      * Description of the event.
@@ -51,39 +55,51 @@ public class Event implements Serializable {
      * Cannot be null.
      */
     @Column(
+            name = "event_description",
             nullable = false,
             length = 65535
     )
     @NotBlank(message = "Please provide an event description")
-    private String event_description;
+    private String eventDescription;
 
     /**
      * Date and time when the event will take place.
      * Cannot be null.
      */
-    @Column(nullable = false)
-    private LocalDateTime event_date;
+    @Column(
+            name = "event_date",
+            nullable = false
+    )
+    private LocalDateTime eventDate;
 
     /**
      * Indicates whether the event is free.
      */
+    @Column(name = "is_event_free")
     @NotNull
-    private Boolean is_event_free;
+    private Boolean isEventFree;
 
     /**
      * Cost of the event.
      * Precision is 10 and scale is 2.
      */
-    @Column(precision = 10, scale = 2)
-    private BigDecimal event_cost;
+    @Column(
+            name = "event_cost",
+            precision = 10,
+            scale = 2
+    )
+    private BigDecimal eventCost;
 
     /**
      * Link to the event.
      * Cannot be null.
      */
-    @Column(nullable = false)
+    @Column(
+            name = "event_link",
+            nullable = false
+    )
     @NotBlank(message = "Please provide an event link")
-    private String event_link;
+    private String eventLink;
 
     /**
      * Type of the event.
@@ -91,21 +107,24 @@ public class Event implements Serializable {
      * Cannot be null.
      */
     @Column(
+            name = "event_type",
             length = 100,
             nullable = false
     )
     @NotBlank(message = "Please provide an event type")
-    private String event_type;
+    private String eventType;
 
     /**
      * Timestamp when the event was created.
      */
-    private LocalDateTime created_at;
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
     /**
      * Timestamp when the event was last updated.
      */
-    private LocalDateTime updated_at;
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
     /**
      * User who created the event.

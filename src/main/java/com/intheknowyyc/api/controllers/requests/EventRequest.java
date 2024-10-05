@@ -16,34 +16,34 @@ public class EventRequest {
 
     // The organization_name field is annotated with @NotBlank to ensure that the organization name is provided.
     @NotBlank(message = "Please provide an organization name")
-    private String organization_name;
+    private String organizationName;
 
     // The event_name field is annotated with @NotBlank to ensure that the event name is provided.
     @NotBlank(message = "Please provide an event name")
-    private String event_name;
+    private String eventName;
 
     // The event_description field is annotated with @NotBlank to ensure that the event description is provided.
     @NotBlank(message = "Please provide an event description")
-    private String event_description;
+    private String eventDescription;
 
     // The event_date field is annotated with @NotNull to ensure that the event date is provided.
     @NotNull(message = "Please provide an event date")
-    private LocalDateTime event_date;
+    private LocalDateTime eventDate;
 
     // The is_event_free field is annotated with @NotNull to ensure that the event cost is provided.
     @NotNull(message = "Please confirm if the event is free")
-    private Boolean is_event_free;
+    private Boolean isEventFree;
 
     // The event_cost field.
     @Digits(integer = 10, fraction = 2)
-    private BigDecimal event_cost;
+    private BigDecimal eventCost;
 
     // The event_link field is annotated with @NotBlank to ensure that the event link is provided.
     @NotBlank(message = "Please provide an event link")
-    private String event_link;
+    private String eventLink;
 
     // The event_type field is annotated with @NotBlank to ensure that the event type is provided.
     @NotBlank(message = "Please provide an event type")
-    private String event_type;
+    private String eventType;
 
 }

@@ -19,7 +19,7 @@ public class UserRequest {
     private String password;
 
     @NotBlank(message = "Please provide a full name")
-    private String full_name;
+    private String fullName;
 
 
 }
