@@ -1,9 +1,11 @@
 package com.intheknowyyc.api.controllers;
+
+import com.intheknowyyc.api.controllers.requests.UserRequest;
 import com.intheknowyyc.api.data.models.User;
 import com.intheknowyyc.api.services.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -16,11 +18,6 @@ public class UserController {
 
     private final UserService userService;
 
-    /**
-     * Constructs a new UserController with the given UserService.
-     *
-     * @param userService the UserService to use for user management
-     */
     @Autowired
     public UserController(UserService userService) {
         this.userService = userService;
@@ -43,44 +40,33 @@ public class UserController {
      * @return the user with the given ID
      */
     @GetMapping(path = "/{userId}")
-    public User getOneById(@PathVariable long userId){
+    public User getOneById(@PathVariable int userId){
         return userService.getUserById(userId);
     }
 
     /**
      * Creates a new user.
      *
-     * @param user the user to create
+     * @param request the user data to create
      */
     @PostMapping
-    public void createNewUser(@RequestBody User user) {
-        user.setCreated_at(LocalDateTime.now());
-        user.setUpdated_at(LocalDateTime.now());
-        userService.createNewUser(user);
+    public void createNewUser(@Valid @RequestBody UserRequest request) {
+        userService.registerNewUser(request);
     }
 
     /**
      * Updates an existing user.
      *
      * @param userId the ID of the user to update
-     * @param user the user data to update
+     * @param request the new user data
      */
     @PutMapping(path = "/{userId}")
     public void updateUser(
-            @PathVariable("userId") long userId,
-            @RequestBody User user
+            @PathVariable("userId") int userId,
+            @Valid
+            @RequestBody UserRequest request
     ) {
-        userService.updateUser(userId, user.getPassword_hash(), user.getFull_name());
-    }
-
-    /**
-     * Deletes a user by their ID.
-     *
-     * @param userId the ID of the user to delete
-     */
-    @DeleteMapping(path = "/{userId}")
-    public void deleteUser(@PathVariable("userId") long userId) {
-        userService.deleteUser(userId);
+        userService.updateUser(userId, request);
     }
 
 }

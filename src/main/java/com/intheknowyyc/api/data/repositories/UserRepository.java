@@ -12,7 +12,7 @@ import java.util.Optional;
  * Provides methods to perform CRUD operations and custom queries on User entities.
  */
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User, Integer> {
 
     /**
      * Finds a user by their email address.
@@ -22,14 +22,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
      */
     @Query("SELECT user FROM User user WHERE user.email=?1")
     Optional<User> findUserByEmail(String email);
-
-    /**
-     * Finds a user by their username.
-     *
-     * @param username the username of the user to find
-     * @return an Optional containing the found user, or empty if no user was found
-     */
-    @Query("SELECT user FROM User user WHERE user.username=?1")
-    Optional<User> findUserByUsername(String username);
 
 }
