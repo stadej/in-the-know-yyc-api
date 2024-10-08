@@ -61,7 +61,7 @@ public class UserService implements UserDetailsService {
      * @param request the user data to register
      * @throws IllegalStateException if a user with the given email already exists
      */
-    public void registerNewUser(@RequestBody UserRequest request) {
+    public User registerNewUser(@RequestBody UserRequest request) {
         if (userRepository.findUserByEmail(request.getEmail()).isPresent()) {
             throw new IllegalStateException("User with this email already exists.");
         } else {
@@ -73,6 +73,7 @@ public class UserService implements UserDetailsService {
             user.setUpdatedAt(LocalDateTime.now());
             user.setRole(UserRole.USER);
             userRepository.save(user);
+            return user;
         }
     }
 
@@ -84,7 +85,7 @@ public class UserService implements UserDetailsService {
      * @throws IllegalStateException if no user with the given ID exists
      */
     @Transactional
-    public void updateUser(int userId, @Valid UserRequest request
+    public User updateUser(int userId, @Valid UserRequest request
     ) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() ->
@@ -99,6 +100,7 @@ public class UserService implements UserDetailsService {
             user.setFullName(request.getFullName());
         }
         user.setUpdatedAt(LocalDateTime.now());
+        return user;
     }
 
     /**
