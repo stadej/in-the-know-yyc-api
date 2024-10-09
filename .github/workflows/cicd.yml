@@ -74,7 +74,7 @@ jobs:
     needs: [ prepare-env, build ]
     runs-on: ${{ needs.prepare-env.outputs.runner }}
 
-    if: ${{ endsWith(github.ref, '/prod') || endsWith(github.ref, '/develop') }}
+    # if: ${{ endsWith(github.ref, '/prod') || endsWith(github.ref, '/develop') }}
 
     steps:
       - name: Pull Image from Docker Hub
@@ -84,4 +84,4 @@ jobs:
         run: docker rm -f in-the-know-yyc-api-${{ needs.prepare-env.outputs.env }}-container
 
       - name: Run docker container
-        run: docker run -d -p 9090:9090 --name in-the-know-yyc-api-${{ needs.prepare-env.outputs.env }}-container intheknowyyc/in-the-know-yyc-api-${{ needs.prepare-env.outputs.env }}
+        run: docker run -d -p 9999:9999 --name in-the-know-yyc-api-${{ needs.prepare-env.outputs.env }}-container intheknowyyc/in-the-know-yyc-api-${{ needs.prepare-env.outputs.env }}
