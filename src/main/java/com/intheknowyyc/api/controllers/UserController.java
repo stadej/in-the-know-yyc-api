@@ -5,6 +5,7 @@ import com.intheknowyyc.api.data.models.User;
 import com.intheknowyyc.api.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -52,7 +53,7 @@ public class UserController {
      */
     @PostMapping
     public ResponseEntity<User> createNewUser(@Valid @RequestBody UserRequest request) {
-        return ResponseEntity.ok(userService.registerNewUser(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.registerNewUser(request));
     }
 
     /**
@@ -67,7 +68,7 @@ public class UserController {
             @Valid
             @RequestBody UserRequest request
     ) {
-        return ResponseEntity.ok(userService.updateUser(userId, request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.updateUser(userId, request));
     }
 
 }

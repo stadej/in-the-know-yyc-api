@@ -8,6 +8,7 @@ import com.intheknowyyc.api.services.UserService;
 import com.intheknowyyc.api.utils.AuthenticatedUserUtil;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -83,7 +84,7 @@ public class EventController {
             @Valid @RequestBody EventRequest request
     ) {
         Event event = eventService.updateEvent(eventId, request);
-        return ResponseEntity.ok(event);
+        return ResponseEntity.status(HttpStatus.CREATED).body(event);
     }
 
     /**
@@ -94,7 +95,7 @@ public class EventController {
     @DeleteMapping(path = "/{eventId}")
     public ResponseEntity<String> deleteEvent(@PathVariable int eventId) {
         eventService.deleteEvent(eventId);
-        return ResponseEntity.ok("Event deleted successfully.");
+        return ResponseEntity.noContent().build();
     }
 
 }
