@@ -49,8 +49,8 @@ public class SecurityConfig {
                         authorize ->
                                 authorize
                                         .requestMatchers(HttpMethod.GET, "/users").hasAuthority("ADMIN")
-                                        .requestMatchers(HttpMethod.GET, "/events").permitAll()
-                                        .requestMatchers(HttpMethod.POST).permitAll()
+                                        .requestMatchers(HttpMethod.GET, "/events/**").permitAll()
+                                        .requestMatchers(HttpMethod.POST,"/events").permitAll()
                                         .anyRequest()
                                         .authenticated())
                 .formLogin(withDefaults())

@@ -72,7 +72,7 @@ public class EventService {
      * @param request the new event data
      */
     @Transactional
-    public void updateEvent(
+    public Event updateEvent(
             int eventId,
             EventRequest request
     ) {
@@ -106,6 +106,7 @@ public class EventService {
         }
         event.setUpdatedAt(LocalDateTime.now());
         eventRepository.save(event);
+        return event;
     }
 
     /**
@@ -115,7 +116,7 @@ public class EventService {
      * @throws IllegalStateException if the event does not exist
      */
     public void deleteEvent(int eventId) {
-        if(eventRepository.existsById(eventId)) {
+        if(eventRepository.findEventById(eventId).isPresent()) {
             eventRepository.deleteById(eventId);
         } else {
             throw new IllegalStateException(String.format(EVENT_NOT_FOUND_BY_ID, eventId));

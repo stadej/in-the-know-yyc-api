@@ -46,6 +46,7 @@ public class User implements Serializable, UserDetails {
      * The hashed password of the user.
      * This field is mandatory.
      */
+    @JsonIgnore
     @Column(nullable = false)
     @NotBlank(message = "Please provide a password")
     private String password;
