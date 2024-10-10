@@ -91,7 +91,7 @@ jobs:
     needs: [ prepare-env, build ]
     runs-on: ${{ needs.prepare-env.outputs.runner }}
 
-    #if: ${{ endsWith(github.ref, '/prod') || endsWith(github.ref, '/develop') }}
+    if: ${{ endsWith(github.ref, '/prod') || endsWith(github.ref, '/develop') }}
 
     steps:
       - name: Pull Image from Docker Hub
