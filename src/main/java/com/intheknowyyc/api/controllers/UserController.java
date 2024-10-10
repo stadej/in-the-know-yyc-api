@@ -5,6 +5,8 @@ import com.intheknowyyc.api.data.models.User;
 import com.intheknowyyc.api.services.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -50,8 +52,8 @@ public class UserController {
      * @param request the user data to create
      */
     @PostMapping
-    public void createNewUser(@Valid @RequestBody UserRequest request) {
-        userService.registerNewUser(request);
+    public ResponseEntity<User> createNewUser(@Valid @RequestBody UserRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.registerNewUser(request));
     }
 
     /**
@@ -61,12 +63,12 @@ public class UserController {
      * @param request the new user data
      */
     @PutMapping(path = "/{userId}")
-    public void updateUser(
+    public ResponseEntity<User> updateUser(
             @PathVariable("userId") int userId,
             @Valid
             @RequestBody UserRequest request
     ) {
-        userService.updateUser(userId, request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.updateUser(userId, request));
     }
 
 }

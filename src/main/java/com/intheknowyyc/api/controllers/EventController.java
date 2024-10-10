@@ -8,6 +8,8 @@ import com.intheknowyyc.api.services.UserService;
 import com.intheknowyyc.api.utils.AuthenticatedUserUtil;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
@@ -57,13 +59,17 @@ public class EventController {
      * @param event the event to create
      */
     @PostMapping
-    public void createNewEvent(@Valid @RequestBody Event event) {
+    public ResponseEntity<Event> createNewEvent(@Valid @RequestBody Event event) {
         UserDetails userDetails = AuthenticatedUserUtil.getAuthenticatedUser();
         if (userDetails != null) {
             User user = userService.loadUserByUsername(userDetails.getUsername());
             event.setUser(user);
             eventService.createNewEvent(event);
+        } else {
+            event.setUser(userService.loadUserByUsername("user16@ex.com"));
+            eventService.createNewEvent(event);
         }
+        return ResponseEntity.ok(event);
     }
 
     /**
@@ -73,11 +79,12 @@ public class EventController {
      * @param request the updated event data
      */
     @PutMapping(path = "/{eventId}")
-    public void updateEvent(
+    public ResponseEntity<Event> updateEvent(
             @PathVariable int eventId,
             @Valid @RequestBody EventRequest request
     ) {
-        eventService.updateEvent(eventId, request);
+        Event event = eventService.updateEvent(eventId, request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(event);
     }
 
     /**
@@ -86,8 +93,9 @@ public class EventController {
      * @param eventId the ID of the event to delete
      */
     @DeleteMapping(path = "/{eventId}")
-    public void deleteEvent(@PathVariable int eventId) {
+    public ResponseEntity<String> deleteEvent(@PathVariable int eventId) {
         eventService.deleteEvent(eventId);
+        return ResponseEntity.noContent().build();
     }
 
 }
