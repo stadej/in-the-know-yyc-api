@@ -22,19 +22,19 @@ jobs:
         run: |
           echo 'env: dev'
           echo  "SELF_HOSTED_RUNNER=aws-ec2-dev" >> $GITHUB_ENV
-          echo  "NAME=dev" >> $GITHUB_ENV
-          echo  "PORT=${{ vars.PORT_PROD }}" >> $GITHUB_ENV
-          echo  "DB_URL=${{ vars.DB_URL_PROD }}" >> $GITHUB_ENV
-          echo  "DB_USER=${{ vars.DB_USER_PROD }}" >> $GITHUB_ENV
+          echo  "NAME=dev" >> $GITHUB_ENV          
+          echo  "PORT=${{ vars.PORT_DEV }}" >> $GITHUB_ENV
+          echo  "DB_URL=${{ vars.DB_URL_DEV }}" >> $GITHUB_ENV
+          echo  "DB_USER=${{ vars.DB_USER_DEV }}" >> $GITHUB_ENV
       - name: Set env vars (prod)
         if: endsWith(github.ref, '/prod')
         run: |
           echo 'env: prod'
           echo  "SELF_HOSTED_RUNNER=aws-ec2-prod" >> $GITHUB_ENV
           echo  "NAME=prod" >> $GITHUB_ENV
-          echo  "PORT=${{ vars.PORT_DEV }}" >> $GITHUB_ENV
-          echo  "DB_URL=${{ vars.DB_URL_DEV }}" >> $GITHUB_ENV
-          echo  "DB_USER=${{ vars.DB_USER_DEV }}" >> $GITHUB_ENV
+          echo  "PORT=${{ vars.PORT_PROD }}" >> $GITHUB_ENV
+          echo  "DB_URL=${{ vars.DB_URL_PROD }}" >> $GITHUB_ENV
+          echo  "DB_USER=${{ vars.DB_USER_PROD }}" >> $GITHUB_ENV
       - name: Set env vars (test)
         if: ${{ !endsWith(github.ref, '/prod') && !endsWith(github.ref, '/develop') }}
         run: |
@@ -42,9 +42,7 @@ jobs:
           echo  "SELF_HOSTED_RUNNER=aws-ec2-dev" >> $GITHUB_ENV
           echo  "NAME=test" >> $GITHUB_ENV
           echo  "PORT=9999" >> $GITHUB_ENV
-          echo  ${{ vars.DB_URL_DEV }}
           echo  "DB_URL=${{ vars.DB_URL_DEV }}" >> $GITHUB_ENV
-          echo  ${{ vars.DB_USER_DEV }}
           echo  "DB_USER=${{ vars.DB_USER_DEV }}" >> $GITHUB_ENV
     outputs:
       runner: ${{ env.SELF_HOSTED_RUNNER }}
