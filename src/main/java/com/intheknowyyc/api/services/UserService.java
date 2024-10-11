@@ -1,13 +1,13 @@
 package com.intheknowyyc.api.services;
 
 import com.intheknowyyc.api.controllers.requests.UserRequest;
+import com.intheknowyyc.api.data.exceptions.UserNotFoundException;
 import com.intheknowyyc.api.data.models.User;
 import com.intheknowyyc.api.data.models.UserRole;
 import com.intheknowyyc.api.data.repositories.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +17,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
-import static com.intheknowyyc.api.utils.Constants.*;
+import static com.intheknowyyc.api.utils.Constants.USER_NOT_FOUND_BY_EMAIL;
+import static com.intheknowyyc.api.utils.Constants.USER_NOT_FOUND_BY_ID;
 
 /**
  * Service class for managing User entities.
@@ -49,10 +50,9 @@ public class UserService implements UserDetailsService {
      *
      * @param userId the ID of the user to retrieve
      * @return the user with the given ID
-     * @throws IllegalStateException if no user with the given ID exists
      */
     public User getUserById(int userId) {
-        return userRepository.findById(userId).orElseThrow(() -> new IllegalStateException(String.format(USER_NOT_FOUND_BY_ID, userId)));
+        return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(String.format(USER_NOT_FOUND_BY_ID, userId)));
     }
 
     /**
@@ -108,12 +108,11 @@ public class UserService implements UserDetailsService {
      *
      * @param email the email address of the user to load
      * @return the user with the given email address
-     * @throws UsernameNotFoundException if no user with the given email address exists
      */
     @Override
-    public User loadUserByUsername(String email) throws UsernameNotFoundException {
+    public User loadUserByUsername(String email) {
         return userRepository.findUserByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException(String.format(USER_NOT_FOUND_BY_EMAIL, email)));
+                .orElseThrow(() -> new UserNotFoundException(String.format(USER_NOT_FOUND_BY_EMAIL, email)));
     }
 
 
