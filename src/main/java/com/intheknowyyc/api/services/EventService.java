@@ -1,6 +1,7 @@
 package com.intheknowyyc.api.services;
 
 import com.intheknowyyc.api.controllers.requests.EventRequest;
+import com.intheknowyyc.api.data.exceptions.ResourceNotFoundException;
 import com.intheknowyyc.api.data.models.Event;
 import com.intheknowyyc.api.data.repositories.EventRepository;
 import jakarta.validation.Valid;
@@ -22,11 +23,13 @@ import static com.intheknowyyc.api.utils.Constants.EVENT_NOT_FOUND_BY_ID;
 @Service
 public class EventService {
 
+    private final UserService userService;
     private final EventRepository eventRepository;
 
     @Autowired
-    public EventService(EventRepository eventRepository) {
+    public EventService(EventRepository eventRepository, UserService userService) {
         this.eventRepository = eventRepository;
+        this.userService = userService;
     }
 
     /**
@@ -43,83 +46,67 @@ public class EventService {
      *
      * @param eventId the ID of the event to retrieve
      * @return the event with the specified ID
-     * @throws IllegalStateException if the event does not exist
      */
     public Event getEventById(int eventId) {
-        return eventRepository.findEventById(eventId).orElseThrow(() -> new IllegalStateException(String.format(EVENT_NOT_FOUND_BY_ID, eventId)));
+        return eventRepository.findEventById(eventId).orElseThrow(() -> new ResourceNotFoundException(String.format(EVENT_NOT_FOUND_BY_ID, eventId)));
     }
 
     /**
      * Creates a new event with the provided details.
      *
      * @param event the event to create
+     * @return a new created event
      */
-    public void createNewEvent(@Valid Event event) {
-        if (event.getIsEventFree() && event.getEventCost().compareTo(BigDecimal.ZERO) != 0) {
+    public Event createNewEvent(@Valid Event event, String userName) {
+
+        if (event.isFreeEvent() && event.getEventCost().compareTo(BigDecimal.ZERO) != 0) {
             throw new IllegalStateException("Event cost must be zero for free events.");
-        } else if (!event.getIsEventFree() && event.getEventCost().compareTo(BigDecimal.ZERO) <= 0) {
+        } else if (!event.isFreeEvent() && event.getEventCost().compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalStateException("Event cost must be greater than zero for paid events.");
         }
+        event.setUser(userService.loadUserByUsername(Objects.requireNonNullElse(userName, "user16@ex.com")));
         event.setCreatedAt(LocalDateTime.now());
         event.setUpdatedAt(LocalDateTime.now());
-        eventRepository.save(event);
+        return eventRepository.save(event);
     }
 
     /**
      * Updates an existing event with the provided details.
      *
      * @param eventId the ID of the event to update
-     * @param request the new event data
+     * @param eventRequest the new event data
      */
     @Transactional
-    public Event updateEvent(
-            int eventId,
-            EventRequest request
-    ) {
-        Event event = eventRepository.findById(eventId)
-                .orElseThrow(() ->
-                        new IllegalStateException(String.format(EVENT_NOT_FOUND_BY_ID, eventId)));
-        if(!Objects.equals(request.getOrganizationName(), event.getOrganizationName())) {
-            event.setOrganizationName(request.getOrganizationName());
-        }
-        if (!Objects.equals(request.getEventName(), event.getEventName())) {
-            event.setEventName(request.getEventName());
-        }
-        if (!Objects.equals(request.getEventDescription(), event.getEventDescription())) {
-            event.setEventDescription(request.getEventDescription());
-        }
-        if (!Objects.equals(request.getEventDate(), event.getEventDate())) {
-            event.setEventDate(request.getEventDate());
-        }
-        event.setIsEventFree(request.getIsEventFree());
-        event.setEventCost(request.getEventCost());
-        if (event.getIsEventFree() && event.getEventCost().compareTo(BigDecimal.ZERO) != 0) {
-            throw new IllegalStateException("Event cost must be zero for free events.");
-        } else if (!event.getIsEventFree() && event.getEventCost().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalStateException("Event cost must be greater than zero for paid events.");
-        }
-        if (!Objects.equals(request.getEventLink(), event.getEventLink())) {
-            event.setEventLink(request.getEventLink());
-        }
-        if (!Objects.equals(request.getEventType(), event.getEventType())) {
-            event.setEventType(request.getEventType());
-        }
-        event.setUpdatedAt(LocalDateTime.now());
-        eventRepository.save(event);
-        return event;
+    public Event updateEvent(int eventId, EventRequest eventRequest) {
+        return eventRepository.findById(eventId).map(event -> {
+            event.setOrganizationName(eventRequest.getOrganizationName());
+            event.setEventName(eventRequest.getEventName());
+            event.setEventDescription(eventRequest.getEventDescription());
+            event.setEventDate(eventRequest.getEventDate());
+            event.setFreeEvent(eventRequest.isFreeEvent());
+            event.setEventCost(eventRequest.getEventCost());
+            if (event.isFreeEvent() && event.getEventCost().compareTo(BigDecimal.ZERO) != 0) {
+                throw new IllegalStateException("Event cost must be zero for free events.");
+            } else if (!event.isFreeEvent() && event.getEventCost().compareTo(BigDecimal.ZERO) <= 0) {
+                throw new IllegalStateException("Event cost must be greater than zero for paid events.");
+            }
+            event.setEventLink(eventRequest.getEventLink());
+            event.setEventType(eventRequest.getEventType());
+            event.setUpdatedAt(LocalDateTime.now());
+            return eventRepository.save(event);
+        }).orElseThrow(() -> new ResourceNotFoundException(String.format(EVENT_NOT_FOUND_BY_ID, eventId)));
     }
 
     /**
      * Deletes an event by its ID.
      *
      * @param eventId the ID of the event to delete
-     * @throws IllegalStateException if the event does not exist
      */
     public void deleteEvent(int eventId) {
-        if(eventRepository.findEventById(eventId).isPresent()) {
+        if (eventRepository.findEventById(eventId).isPresent()) {
             eventRepository.deleteById(eventId);
         } else {
-            throw new IllegalStateException(String.format(EVENT_NOT_FOUND_BY_ID, eventId));
+            throw new ResourceNotFoundException(String.format(EVENT_NOT_FOUND_BY_ID, eventId));
         }
     }
 }

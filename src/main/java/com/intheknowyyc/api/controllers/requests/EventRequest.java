@@ -32,7 +32,7 @@ public class EventRequest {
 
     // The is_event_free field is annotated with @NotNull to ensure that the event cost is provided.
     @NotNull(message = "Please confirm if the event is free")
-    private Boolean isEventFree;
+    private boolean freeEvent;
 
     // The event_cost field.
     @Digits(integer = 10, fraction = 2)

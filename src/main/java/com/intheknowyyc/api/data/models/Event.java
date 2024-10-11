@@ -77,7 +77,7 @@ public class Event implements Serializable {
      */
     @Column(name = "is_event_free")
     @NotNull
-    private Boolean isEventFree;
+    private boolean freeEvent;
 
     /**
      * Cost of the event.
@@ -133,5 +133,4 @@ public class Event implements Serializable {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
-
 }
