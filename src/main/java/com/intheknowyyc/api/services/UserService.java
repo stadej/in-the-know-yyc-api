@@ -71,7 +71,7 @@ public class UserService implements UserDetailsService {
             user.setFullName(request.getFullName());
             user.setCreatedAt(LocalDateTime.now());
             user.setUpdatedAt(LocalDateTime.now());
-            user.setRole(UserRole.USER);
+            user.setRole(UserRole.ROLE_USER);
             userRepository.save(user);
             return user;
         }

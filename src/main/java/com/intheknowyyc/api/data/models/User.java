@@ -1,4 +1,5 @@
 package com.intheknowyyc.api.data.models;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -12,7 +13,6 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 /**
  * Represents a user entity in the system.
@@ -76,14 +76,6 @@ public class User implements Serializable, UserDetails {
     private boolean locked;
 
     private boolean expired;
-
-    /**
-     * The list of events associated with the user.
-     * This is a one-to-many relationship where one user can have multiple events.
-     */
-    @OneToMany(mappedBy = "user")
-    @JsonIgnore
-    private List<Event> events;
 
     /**
      * The role of the user.
