@@ -83,12 +83,15 @@ public class EventController {
      * @param eventRequest the event to create
      */
     @Operation(summary = "Create a new event",
-            description = "Create a new event. All users can create events.")
+            description = "Create a new event. Only administrators can create events.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Event created successfully", content = {@Content(schema = @Schema(implementation = Event.class), mediaType = "application/json")}),
             @ApiResponse(responseCode = "400", description = "Invalid input data", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Forbidden access", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<Event> createNewEvent(@Valid @RequestBody @Parameter(description = "Details of the event to create") EventRequest eventRequest) {
         UserDetails userDetails = AuthenticatedUserUtil.getAuthenticatedUser();
