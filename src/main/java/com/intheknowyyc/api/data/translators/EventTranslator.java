@@ -1,7 +1,9 @@
 package com.intheknowyyc.api.data.translators;
 
 import com.intheknowyyc.api.controllers.requests.EventRequest;
+import com.intheknowyyc.api.controllers.responses.PaginatedEventResponse;
 import com.intheknowyyc.api.data.models.Event;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,5 +20,15 @@ public class EventTranslator {
         event.setEventLink(eventRequest.getEventLink());
         event.setEventType(eventRequest.getEventType());
         return event;
+    }
+
+    public PaginatedEventResponse translateToPaginatedResponse(Page<Event> eventPage){
+        PaginatedEventResponse response = new PaginatedEventResponse();
+        response.setContent(eventPage.getContent());
+        response.setSize(eventPage.getSize());
+        response.setNumber(eventPage.getNumber());
+        response.setTotalPages(eventPage.getTotalPages());
+        response.setTotalElements(eventPage.getTotalElements());
+        return response;
     }
 }

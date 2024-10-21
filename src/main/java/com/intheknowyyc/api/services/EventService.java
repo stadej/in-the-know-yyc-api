@@ -6,12 +6,13 @@ import com.intheknowyyc.api.data.models.Event;
 import com.intheknowyyc.api.data.repositories.EventRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Objects;
 
 import static com.intheknowyyc.api.utils.Constants.EVENT_NOT_FOUND_BY_ID;
@@ -32,13 +33,15 @@ public class EventService {
         this.userService = userService;
     }
 
-    /**
-     * Retrieves all events from the repository.
-     *
-     * @return a list of all events
-     */
-    public List<Event> getAllEvents() {
-        return eventRepository.findAll();
+    public Page<Event> getFilteredEvents(
+            LocalDateTime startDate,
+            LocalDateTime endDate,
+            String eventType,
+            String organizationName,
+            String searchText,
+            Pageable pageable
+    ) {
+        return eventRepository.findFilteredEvents(startDate, endDate, eventType, organizationName, searchText, pageable);
     }
 
     /**
@@ -73,7 +76,7 @@ public class EventService {
     /**
      * Updates an existing event with the provided details.
      *
-     * @param eventId the ID of the event to update
+     * @param eventId      the ID of the event to update
      * @param eventRequest the new event data
      */
     @Transactional
