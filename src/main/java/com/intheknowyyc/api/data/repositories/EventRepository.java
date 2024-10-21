@@ -12,7 +12,7 @@ import java.util.Optional;
  * Extends JpaRepository to provide CRUD operations.
  */
 @Repository
-public interface EventRepository extends JpaRepository<Event, Integer> {
+public interface EventRepository extends JpaRepository<Event, Integer>, EventRepositoryCustom {
 
     /**
      * Finds an Event by its ID.
