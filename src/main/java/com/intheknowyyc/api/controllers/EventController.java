@@ -91,8 +91,8 @@ public class EventController {
             @Parameter(description = "Sorting direction: 'asc' or 'desc'", example = "asc")
             @RequestParam(required = false) @Pattern(regexp = "^(asc|desc)?$", message = "Sorting direction must be 'asc' or 'desc'") String sortDirection
     ) {
-        Pageable pageable = null;
-        if (!sortField.isEmpty()) {
+        Pageable pageable = PageRequest.of(page, size);
+        if (sortField != null && !sortField.isEmpty()) {
             Sort sorting = Sort.unsorted();
             if (!sortDirection.isEmpty()) {
                 sorting = "asc".equalsIgnoreCase(sortDirection)
