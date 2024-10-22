@@ -35,6 +35,10 @@ public class Constants {
      */
     public static final String SUBSCRIPTION_NOT_FOUND_BY_EMAIL = "Subscription with email %s not found";
 
+    /**
+     * A constant string message used when a subscription is not found by UUID.
+     * The %s placeholder is intended to be replaced with the subscription's UUID.
+     */
     public static final String SUBSCRIPTION_NOT_FOUND_BY_UUID = "Subscription with UUID %s not found";
 
 }
