@@ -19,6 +19,7 @@ public class EventTranslator {
         event.setEventCost(eventRequest.getEventCost());
         event.setEventLink(eventRequest.getEventLink());
         event.setEventType(eventRequest.getEventType());
+        event.setEventImage(eventRequest.getEventImage());
         return event;
     }
 
