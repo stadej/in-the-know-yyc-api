@@ -95,6 +95,7 @@ public class EventService {
             }
             event.setEventLink(eventRequest.getEventLink());
             event.setEventType(eventRequest.getEventType());
+            event.setEventImage(eventRequest.getEventImage());
             event.setUpdatedAt(LocalDateTime.now());
             return eventRepository.save(event);
         }).orElseThrow(() -> new ResourceNotFoundException(String.format(EVENT_NOT_FOUND_BY_ID, eventId)));

@@ -46,4 +46,6 @@ public class EventRequest {
     @NotBlank(message = "Please provide an event type")
     private String eventType;
 
+    private String eventImage;
+
 }

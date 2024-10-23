@@ -115,6 +115,14 @@ public class Event implements Serializable {
     private String eventType;
 
     /**
+     * Name of event image file in cloud storage
+     */
+    @Column(
+            name = "event_image"
+    )
+    private String eventImage;
+
+    /**
      * Timestamp when the event was created.
      */
     @Column(name = "created_at")
