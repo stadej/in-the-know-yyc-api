@@ -1,5 +1,6 @@
 package com.intheknowyyc.api.data.repositories.helpers;
 
+import com.intheknowyyc.api.data.exceptions.BadRequestException;
 import jakarta.persistence.Column;
 
 import java.lang.reflect.Field;
@@ -32,7 +33,7 @@ public class ColumnNameResolver {
             // If no @Column annotation is found, return the field name as a fallback.
             return fieldName;
         } catch (NoSuchFieldException e) {
-            throw new IllegalArgumentException("Field not found: " + fieldName, e);
+            throw new BadRequestException("Field not found: " + fieldName);
         }
     }
 }

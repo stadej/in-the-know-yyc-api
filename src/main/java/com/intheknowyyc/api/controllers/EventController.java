@@ -1,6 +1,7 @@
 package com.intheknowyyc.api.controllers;
 
 import com.intheknowyyc.api.controllers.requests.EventRequest;
+import com.intheknowyyc.api.controllers.responses.ErrorResponse;
 import com.intheknowyyc.api.controllers.responses.PaginatedEventResponse;
 import com.intheknowyyc.api.data.models.Event;
 import com.intheknowyyc.api.data.translators.EventTranslator;
@@ -67,7 +68,7 @@ public class EventController {
             description = "Retrieve a list of events with optional filters and pagination.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved list of events", content = {@Content(schema = @Schema(implementation = PaginatedEventResponse.class), mediaType = "application/json")}),
-            @ApiResponse(responseCode = "400", description = "Invalid input data", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Invalid input data", content = @Content(schema = @Schema(implementation = ErrorResponse.class), mediaType = "application/json")),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     @GetMapping
