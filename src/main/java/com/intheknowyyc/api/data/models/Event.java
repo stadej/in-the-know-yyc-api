@@ -1,12 +1,16 @@
 package com.intheknowyyc.api.data.models;
 
+import com.intheknowyyc.api.controllers.requests.EventRequest;
+import com.intheknowyyc.api.data.converters.SpeakersConverter;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * Entity class representing an event.
@@ -113,6 +117,17 @@ public class Event implements Serializable {
     )
     @NotBlank(message = "Please provide an event type")
     private String eventType;
+
+    @Column(name = "location", nullable = false)
+    @NotBlank(message = "Please provide an event location")
+    private String location;
+
+    @Column(name = "industry")
+    private String industry;
+
+    @Column(name = "speakers", columnDefinition = "TEXT")
+    @Convert(converter = SpeakersConverter.class)
+    private List<EventRequest.Speaker> speakers;
 
     /**
      * Name of event image file in cloud storage

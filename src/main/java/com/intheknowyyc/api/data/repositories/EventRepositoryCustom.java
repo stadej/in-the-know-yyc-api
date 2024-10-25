@@ -11,6 +11,7 @@ public interface EventRepositoryCustom {
                                    LocalDateTime endDate,
                                    String eventType,
                                    String organizationName,
+                                   String location,
                                    String searchText,
                                    Pageable pageable);
 }

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class EventTranslator {
 
-    public Event translateToEvent(EventRequest eventRequest){
+    public Event translateToEvent(EventRequest eventRequest) {
         Event event = new Event();
         event.setOrganizationName(eventRequest.getOrganizationName());
         event.setEventName(eventRequest.getEventName());
@@ -20,10 +20,13 @@ public class EventTranslator {
         event.setEventLink(eventRequest.getEventLink());
         event.setEventType(eventRequest.getEventType());
         event.setEventImage(eventRequest.getEventImage());
+        event.setLocation(eventRequest.getLocation());
+        event.setIndustry(eventRequest.getIndustry());
+        event.setSpeakers(eventRequest.getSpeakers());
         return event;
     }
 
-    public PaginatedEventResponse translateToPaginatedResponse(Page<Event> eventPage){
+    public PaginatedEventResponse translateToPaginatedResponse(Page<Event> eventPage) {
         PaginatedEventResponse response = new PaginatedEventResponse();
         response.setContent(eventPage.getContent());
         response.setSize(eventPage.getSize());

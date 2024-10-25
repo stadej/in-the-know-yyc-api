@@ -81,6 +81,8 @@ public class EventController {
             @RequestParam(required = false) String eventType,
             @Parameter(description = "Organization name", example = "TechOrg")
             @RequestParam(required = false) String organizationName,
+            @Parameter(description = "Location", example = "Calgary")
+            @RequestParam(required = false) String location,
             @Parameter(description = "Search text for filtering events", example = "technology")
             @RequestParam(required = false) String searchText,
             @Parameter(description = "Page number (zero-based)", example = "0")
@@ -107,6 +109,7 @@ public class EventController {
                 endDate,
                 eventType,
                 organizationName,
+                location,
                 searchText,
                 pageable);
 
