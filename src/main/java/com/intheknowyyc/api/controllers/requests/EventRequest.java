@@ -7,6 +7,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * Request object for creating a new event.
@@ -46,6 +47,21 @@ public class EventRequest {
     @NotBlank(message = "Please provide an event type")
     private String eventType;
 
+    @NotBlank(message = "Please provide a location")
+    private String location;
+
+    private String industry;
+
+    private List<Speaker> speakers;
+
     private String eventImage;
 
+    @Data
+    public static class Speaker {
+        @NotBlank(message = "Please provide the speaker's name")
+        private String name;
+
+        @NotBlank(message = "Please provide the company of the speaker")
+        private String company;
+    }
 }

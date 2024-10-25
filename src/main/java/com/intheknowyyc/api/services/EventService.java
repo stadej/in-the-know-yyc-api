@@ -38,10 +38,11 @@ public class EventService {
             LocalDateTime endDate,
             String eventType,
             String organizationName,
+            String location,
             String searchText,
             Pageable pageable
     ) {
-        return eventRepository.findFilteredEvents(startDate, endDate, eventType, organizationName, searchText, pageable);
+        return eventRepository.findFilteredEvents(startDate, endDate, eventType, organizationName, location, searchText, pageable);
     }
 
     /**

@@ -26,7 +26,7 @@ public class EventRepositoryCustomImpl implements EventRepositoryCustom {
     private EntityManager entityManager;
 
     @Override
-    public Page<Event> findFilteredEvents(LocalDateTime startDate, LocalDateTime endDate, String eventType, String organizationName, String searchText, Pageable pageable) {
+    public Page<Event> findFilteredEvents(LocalDateTime startDate, LocalDateTime endDate, String eventType, String organizationName, String location, String searchText, Pageable pageable) {
         StringBuilder sql = new StringBuilder("SELECT * FROM events e WHERE 1=1");
         StringBuilder sqlConditions = new StringBuilder();
         Map<String, Object> parameters = new HashMap<>();
@@ -35,6 +35,7 @@ public class EventRepositoryCustomImpl implements EventRepositoryCustom {
         appendConditionIfNotNull(sqlConditions, "e.event_date >= :startDate", startDate, "startDate", parameters);
         appendConditionIfNotNull(sqlConditions, "e.event_date <= :endDate", endDate, "endDate", parameters);
         appendConditionIfNotEmpty(sqlConditions, "e.event_type = :eventType", eventType, "eventType", parameters);
+        appendConditionIfNotEmpty(sqlConditions, "e.location = :location", location, "location", parameters);
         appendConditionIfNotEmpty(sqlConditions, "e.organization_name = :organizationName", organizationName, "organizationName", parameters);
         appendSearchCondition(sqlConditions, searchText, parameters);
 
