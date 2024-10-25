@@ -1,6 +1,7 @@
 package com.intheknowyyc.api.services;
 
 import com.intheknowyyc.api.controllers.requests.EventRequest;
+import com.intheknowyyc.api.data.exceptions.BadRequestException;
 import com.intheknowyyc.api.data.exceptions.ResourceNotFoundException;
 import com.intheknowyyc.api.data.models.Event;
 import com.intheknowyyc.api.data.repositories.EventRepository;
@@ -64,9 +65,9 @@ public class EventService {
     public Event createNewEvent(@Valid Event event, String userName) {
 
         if (event.isFreeEvent() && event.getEventCost().compareTo(BigDecimal.ZERO) != 0) {
-            throw new IllegalStateException("Event cost must be zero for free events.");
+            throw new BadRequestException("Event cost must be zero for free events.");
         } else if (!event.isFreeEvent() && event.getEventCost().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalStateException("Event cost must be greater than zero for paid events.");
+            throw new BadRequestException("Event cost must be greater than zero for paid events.");
         }
         event.setUser(userService.loadUserByUsername(Objects.requireNonNullElse(userName, "user16@ex.com")));
         event.setCreatedAt(LocalDateTime.now());
@@ -90,9 +91,9 @@ public class EventService {
             event.setFreeEvent(eventRequest.isFreeEvent());
             event.setEventCost(eventRequest.getEventCost());
             if (event.isFreeEvent() && event.getEventCost().compareTo(BigDecimal.ZERO) != 0) {
-                throw new IllegalStateException("Event cost must be zero for free events.");
+                throw new BadRequestException("Event cost must be zero for free events.");
             } else if (!event.isFreeEvent() && event.getEventCost().compareTo(BigDecimal.ZERO) <= 0) {
-                throw new IllegalStateException("Event cost must be greater than zero for paid events.");
+                throw new BadRequestException("Event cost must be greater than zero for paid events.");
             }
             event.setEventLink(eventRequest.getEventLink());
             event.setEventType(eventRequest.getEventType());
