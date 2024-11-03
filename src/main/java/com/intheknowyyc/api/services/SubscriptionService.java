@@ -15,7 +15,7 @@ import org.springframework.web.client.RestTemplate;
 @Service
 public class SubscriptionService {
 
-    @Value("${app.mailchimp.api.url}")
+    @Value("${mailchimp_url}")
     private String url;
 
     @Value("${app.mailchimp.api.key}")
