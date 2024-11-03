@@ -1,14 +1,16 @@
 package com.intheknowyyc.api.controllers.requests;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import lombok.ToString;
 
 @Data
+@ToString
 public class SubscriptionRequest {
 
-    @NotBlank(message = "Please provide an email address")
-    @Email(message = "Please provide a valid email address")
-    private String email;
+    @JsonProperty("email_address")
+    private String emailAddress;
+
+    private String status;
 
 }
