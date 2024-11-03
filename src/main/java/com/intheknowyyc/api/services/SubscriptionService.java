@@ -44,6 +44,8 @@ public class SubscriptionService {
      */
     public String subscribe(@RequestBody @Valid SubscriptionRequest subscriptionRequest) {
 
+        subscriptionRequest.setStatus("subscribed");
+
         String link = url + "/lists/" + listId + "/members";
 
         HttpHeaders headers = new HttpHeaders();
