@@ -51,6 +51,7 @@ jobs:
       port: ${{ env.PORT }}
       db_url: ${{ env.DB_URL }}
       db_user: ${{ env.DB_USER }}
+      mailchimp_url: ${{ env.MAILCHIMP_URL }}
 
   build:
     name: Building
@@ -79,7 +80,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build docker image
-        run: docker build --build-arg PORT=${{ needs.prepare-env.outputs.port }} --build-arg DB_URL=${{ needs.prepare-env.outputs.db_url }} --build-arg DB_USER=${{ needs.prepare-env.outputs.db_user }} -t intheknowyyc/in-the-know-yyc-api-${{ needs.prepare-env.outputs.env }} .
+        run: docker build --build-arg PORT=${{ needs.prepare-env.outputs.port }} --build-arg DB_URL=${{ needs.prepare-env.outputs.db_url }} --build-arg DB_USER=${{ needs.prepare-env.outputs.db_user }} --build-arg MAILCHIMP_API_KEY=${{ secrets.MAILCHIMP_API_KEY }} --build-arg MAILCHIMP_LIST_ID=${{ secrets.MAILCHIMP_LIST_ID }} --build-arg MAILCHIMP_URL=${{ needs.prepare-env.outputs.mailchimp_url }} -t intheknowyyc/in-the-know-yyc-api-${{ needs.prepare-env.outputs.env }} .
 
       - name: Publish image to Docker Hub
         run: docker push intheknowyyc/in-the-know-yyc-api-${{ needs.prepare-env.outputs.env }}:latest
