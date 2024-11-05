@@ -46,7 +46,7 @@ public class SubscriptionService {
      */
     public String subscribe(@RequestBody @Valid SubscriptionRequest subscriptionRequest) {
 
-        subscriptionRequest.setStatus("subscribed");
+        subscriptionRequest.setStatus("pending");
         String link = url + "/lists/" + listId + "/members";
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "apikey " + apiKey);
