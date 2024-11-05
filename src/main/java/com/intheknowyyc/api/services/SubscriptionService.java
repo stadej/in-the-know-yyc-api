@@ -1,14 +1,16 @@
 package com.intheknowyyc.api.services;
 
 import com.intheknowyyc.api.controllers.requests.SubscriptionRequest;
+import com.intheknowyyc.api.data.exceptions.BadRequestException;
+import com.intheknowyyc.api.data.exceptions.ResourceNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 
@@ -45,14 +47,18 @@ public class SubscriptionService {
     public String subscribe(@RequestBody @Valid SubscriptionRequest subscriptionRequest) {
 
         subscriptionRequest.setStatus("subscribed");
-
         String link = url + "/lists/" + listId + "/members";
-
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "apikey " + apiKey);
         HttpEntity<SubscriptionRequest> requestEntity = new HttpEntity<>(subscriptionRequest, headers);
-
-        return restTemplate.exchange(link, HttpMethod.POST, requestEntity, String.class).getBody();
-
+        try {
+            return restTemplate.exchange(link, HttpMethod.POST, requestEntity, String.class).getBody();
+        } catch (HttpClientErrorException.BadRequest e) {
+            throw new BadRequestException("Failed to subscribe: " + e.getMessage());
+        } catch (HttpClientErrorException.NotFound e) {
+            throw new ResourceNotFoundException("Resource not found: " + e.getMessage());
+        } catch (RestClientException e) {
+            throw new RestClientException("An error occurred: " + e.getMessage());
+        }
     }
 }

@@ -8,8 +8,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -30,17 +28,13 @@ public class SubscriptionController {
             description = "Registers a new subscriber with email.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Email subscribed successfully.", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
             @ApiResponse(responseCode = "404", description = "Resource not found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     @PostMapping("/subscribe")
-    public ResponseEntity<String> subscribe(@Valid @RequestBody SubscriptionRequest request) {
-        String response = subscriptionService.subscribe(request);
-        try {
-            return ResponseEntity.ok().body(response);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-        }
+    public String subscribe(@Valid @RequestBody SubscriptionRequest request) {
+        return subscriptionService.subscribe(request);
     }
 
 }
