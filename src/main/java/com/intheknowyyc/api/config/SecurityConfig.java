@@ -55,7 +55,7 @@ public class SecurityConfig {
                                         .requestMatchers(HttpMethod.POST,"/users", "/users/**").permitAll()
                                         .requestMatchers(HttpMethod.GET, "/events*", "/events/**").permitAll()
                                         .requestMatchers(HttpMethod.POST,"/subscribe", "/subscribe/**").permitAll()
-                                        .requestMatchers(HttpMethod.DELETE, "/unsubscribe", "/unsubscribe/**").permitAll()
+                                        .requestMatchers(HttpMethod.GET, "/comments*", "/comments/**").permitAll()
                                         .anyRequest()
                                         .authenticated())
                 .formLogin(withDefaults())
