@@ -1,6 +1,7 @@
 package com.intheknowyyc.api.services;
 
 import com.intheknowyyc.api.controllers.requests.LoginRequest;
+import com.intheknowyyc.api.controllers.responses.LoginResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ public class LoginService {
     private final AuthenticationManager authenticationManager;
     private final JWTService jwtService;
 
+
     @Autowired
     public LoginService(AuthenticationManager authenticationManager, JWTService jwtService) {
         this.authenticationManager = authenticationManager;
@@ -31,7 +33,9 @@ public class LoginService {
      * @return a ResponseEntity containing the JWT token if authentication is successful,
      *         or an error message if authentication fails
      */
-    public ResponseEntity<String> login(LoginRequest request) {
+    public ResponseEntity<LoginResponse> login(LoginRequest request) {
+
+        LoginResponse response = new LoginResponse();
 
         try {
             authenticationManager.authenticate(
@@ -40,9 +44,11 @@ public class LoginService {
                             request.getPassword()
                     )
             );
-            return ResponseEntity.ok().body(jwtService.generateToken(request.getEmail()));
+            response.setToken(jwtService.generateToken(request.getEmail()));
+            return ResponseEntity.ok(response);
         } catch (AuthenticationException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Login failed");
+            response.setError("Authentication failed: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
 
     }

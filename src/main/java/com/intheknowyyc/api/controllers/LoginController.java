@@ -1,6 +1,7 @@
 package com.intheknowyyc.api.controllers;
 
 import com.intheknowyyc.api.controllers.requests.LoginRequest;
+import com.intheknowyyc.api.controllers.responses.LoginResponse;
 import com.intheknowyyc.api.services.LoginService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -40,7 +41,7 @@ public class LoginController {
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     @PostMapping("/cms/login")
-    public ResponseEntity<String> login(@RequestBody @Valid LoginRequest request) {
+    public ResponseEntity<LoginResponse> login(@RequestBody @Valid LoginRequest request) {
         return loginService.login(request);
     }
 
