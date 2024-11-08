@@ -79,6 +79,27 @@ public class UserController {
     }
 
     /**
+     * Retrieves a user by their email address.
+     *
+     * @param email the email address of the user to retrieve
+     * @return the user with the given email address
+     */
+    @Operation(summary = "Get user by email",
+            description = "Retrieve a user by email address. Only administrators or current user can view this information.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved an user", content = {@Content(schema = @Schema(implementation = User.class), mediaType = "application/json")}),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Forbidden access", content = @Content),
+            @ApiResponse(responseCode = "404", description = "User not found", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
+    })
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/email/{email}")
+    public ResponseEntity<User> getUserByEmail(@PathVariable @Valid String email) {
+        return ResponseEntity.ok(userService.getUserByEmail(email));
+    }
+
+    /**
      * Creates a new user.
      *
      * @param request the user data to create
