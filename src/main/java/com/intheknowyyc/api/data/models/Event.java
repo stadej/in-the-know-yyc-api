@@ -27,7 +27,7 @@ public class Event implements Serializable {
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private long id;
 
     /**
      * Name of the organization hosting the event.
