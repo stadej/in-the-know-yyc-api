@@ -63,6 +63,7 @@ public class SecurityConfig {
                                         .requestMatchers(HttpMethod.GET, "/events*", "/events/**").permitAll()
                                         .requestMatchers(HttpMethod.POST,"/subscribe", "/subscribe/**").permitAll()
                                         .requestMatchers(HttpMethod.GET, "/comments*", "/comments/**").permitAll()
+                                        .requestMatchers(HttpMethod.POST,"/cms/login").permitAll()
                                         .anyRequest()
                                         .authenticated())
                 .httpBasic(withDefaults())
