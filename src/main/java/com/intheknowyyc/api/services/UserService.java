@@ -55,6 +55,10 @@ public class UserService implements UserDetailsService {
         return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(String.format(USER_NOT_FOUND_BY_ID, userId)));
     }
 
+    public User getUserByEmail(String email) {
+        return userRepository.findUserByEmail(email).orElseThrow(() -> new UserNotFoundException(String.format(USER_NOT_FOUND_BY_EMAIL, email)));
+    }
+
     /**
      * Registers a new user in the repository.
      *

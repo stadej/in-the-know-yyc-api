@@ -1,18 +1,23 @@
 package com.intheknowyyc.api.config;
 
+import com.intheknowyyc.api.config.filter.JWTAuthenticationFilter;
 import com.intheknowyyc.api.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -27,17 +32,19 @@ public class SecurityConfig {
 
     private final UserService userService;
 
-    @Autowired
-    public SecurityConfig(UserService userService) {
-        this.userService = userService;
-    }
+    private final JWTAuthenticationFilter jwtAuthenticationFilter;
 
+    @Autowired
+    public SecurityConfig(UserService userService, JWTAuthenticationFilter jwtAuthenticationFilter) {
+        this.userService = userService;
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+    }
 
     /**
      * Defines the security filter chain.
-     * Disables CSRF protection, allows GET requests for all users,
+     * Disables CSRF protection, allows GET and POST requests for all users,
      * requires authentication for POST requests (restricted to ADMIN role),
-     * and enables form login and HTTP Basic authentication.
+     * and enables HTTP Basic and JWT authentication.
      *
      * @param http the HttpSecurity to configure
      * @return the configured SecurityFilterChain
@@ -45,7 +52,7 @@ public class SecurityConfig {
      */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
+        return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
                         authorize ->
@@ -58,9 +65,10 @@ public class SecurityConfig {
                                         .requestMatchers(HttpMethod.GET, "/comments*", "/comments/**").permitAll()
                                         .anyRequest()
                                         .authenticated())
-                .formLogin(withDefaults())
-                .httpBasic(withDefaults());
-        return http.build();
+                .httpBasic(withDefaults())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .build();
     }
 
     /**
@@ -74,6 +82,12 @@ public class SecurityConfig {
         provider.setUserDetailsService(userService);
         provider.setPasswordEncoder(new BCryptPasswordEncoder(4));
         return provider;
+    }
+
+    // This is required to make the AuthenticationManager available as a bean
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
     }
 
 }
