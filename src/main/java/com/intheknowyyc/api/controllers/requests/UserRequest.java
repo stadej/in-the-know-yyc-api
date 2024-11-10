@@ -2,13 +2,17 @@ package com.intheknowyyc.api.controllers.requests;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Represents a request to register a new user.
  * Contains the data needed to create a new user in the system.
  */
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class UserRequest {
 
     @NotBlank(message = "Please provide an email address")
