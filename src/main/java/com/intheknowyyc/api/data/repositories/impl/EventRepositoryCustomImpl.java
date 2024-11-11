@@ -1,6 +1,7 @@
 package com.intheknowyyc.api.data.repositories.impl;
 
 import com.intheknowyyc.api.data.models.Event;
+import com.intheknowyyc.api.data.models.EventStatus;
 import com.intheknowyyc.api.data.repositories.EventRepositoryCustom;
 import com.intheknowyyc.api.data.repositories.helpers.ColumnNameResolver;
 import jakarta.persistence.EntityManager;
@@ -26,7 +27,7 @@ public class EventRepositoryCustomImpl implements EventRepositoryCustom {
     private EntityManager entityManager;
 
     @Override
-    public Page<Event> findFilteredEvents(LocalDateTime startDate, LocalDateTime endDate, String eventType, String organizationName, String location, String searchText, Pageable pageable) {
+    public Page<Event> findFilteredEvents(LocalDateTime startDate, LocalDateTime endDate, String eventType, String organizationName, String location, String searchText, Pageable pageable, EventStatus status) {
         StringBuilder sql = new StringBuilder("SELECT * FROM events e WHERE 1=1");
         StringBuilder sqlConditions = new StringBuilder();
         Map<String, Object> parameters = new HashMap<>();
@@ -38,6 +39,11 @@ public class EventRepositoryCustomImpl implements EventRepositoryCustom {
         appendConditionIfNotEmpty(sqlConditions, "e.location = :location", location, "location", parameters);
         appendConditionIfNotEmpty(sqlConditions, "e.organization_name = :organizationName", organizationName, "organizationName", parameters);
         appendSearchCondition(sqlConditions, searchText, parameters);
+
+        if (status != null) {
+            sqlConditions.append(" AND e.status = :status");
+            parameters.put("status", status.name());
+        }
 
         sql.append(sqlConditions);
 

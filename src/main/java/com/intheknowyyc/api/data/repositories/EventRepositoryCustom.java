@@ -1,6 +1,7 @@
 package com.intheknowyyc.api.data.repositories;
 
 import com.intheknowyyc.api.data.models.Event;
+import com.intheknowyyc.api.data.models.EventStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -13,5 +14,6 @@ public interface EventRepositoryCustom {
                                    String organizationName,
                                    String location,
                                    String searchText,
-                                   Pageable pageable);
+                                   Pageable pageable,
+                                   EventStatus status);
 }

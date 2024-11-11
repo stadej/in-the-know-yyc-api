@@ -146,7 +146,7 @@ public class CommentController {
 
     })
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/{commentId}/approve")
+    @PatchMapping("/{commentId}/approve")
     public ResponseEntity<Comment> approveComment(
             @Parameter(description = "ID of the comment to approve", example = "456")
             @PathVariable Long commentId) {
@@ -169,7 +169,7 @@ public class CommentController {
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/{commentId}/reject")
+    @PatchMapping("/{commentId}/reject")
     public ResponseEntity<Comment> rejectComment(
             @Parameter(description = "ID of the comment to reject", example = "456")
             @PathVariable Long commentId) {
