@@ -56,7 +56,8 @@ public class EventController {
     }
 
     /**
-     * Retrieves a paginated list of events with optional filters and sorting.
+     * Retrieves a paginated list of events with optional filters, sorting, and access control.
+     * By default, returns only approved events. Admin users can view events with other statuses.
      *
      * @param startDate        optional filter by start date (example: "2024-10-01T10:00:00")
      * @param endDate          optional filter by end date (example: "2024-12-01T18:00:00")
@@ -71,7 +72,7 @@ public class EventController {
      * @return a paginated list of filtered events
      */
     @Operation(summary = "Get filtered and paginated events",
-            description = "Retrieve a list of only approved events with optional filters and pagination.")
+            description = "Retrieve a paginated list of approved events with optional filters. Admins may view events of any status.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved list of events", content = {@Content(schema = @Schema(implementation = PaginatedEventResponse.class), mediaType = "application/json")}),
             @ApiResponse(responseCode = "400", description = "Invalid input data", content = @Content(schema = @Schema(implementation = ErrorResponse.class), mediaType = "application/json")),
