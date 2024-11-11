@@ -4,6 +4,8 @@ import com.intheknowyyc.api.controllers.requests.EventRequest;
 import com.intheknowyyc.api.controllers.responses.ErrorResponse;
 import com.intheknowyyc.api.controllers.responses.PaginatedEventResponse;
 import com.intheknowyyc.api.data.models.Event;
+import com.intheknowyyc.api.data.models.EventFilters;
+import com.intheknowyyc.api.data.models.EventStatus;
 import com.intheknowyyc.api.data.models.User;
 import com.intheknowyyc.api.data.translators.EventTranslator;
 import com.intheknowyyc.api.services.EventService;
@@ -25,8 +27,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -59,6 +63,7 @@ public class EventController {
      * @param eventType        optional filter by event type (example: "conference")
      * @param organizationName optional filter by organization name (example: "TechOrg")
      * @param searchText       optional text search for event details (example: "technology")
+     * @param status           optional filter by event status (default: approved). Only admins can access non-approved events.
      * @param page             page number (default: 0, example: 0)
      * @param size             number of records per page (default: 10, example: 10)
      * @param sortField        field to sort by (example: "eventDate")
@@ -66,10 +71,12 @@ public class EventController {
      * @return a paginated list of filtered events
      */
     @Operation(summary = "Get filtered and paginated events",
-            description = "Retrieve a list of events with optional filters and pagination.")
+            description = "Retrieve a list of only approved events with optional filters and pagination.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved list of events", content = {@Content(schema = @Schema(implementation = PaginatedEventResponse.class), mediaType = "application/json")}),
             @ApiResponse(responseCode = "400", description = "Invalid input data", content = @Content(schema = @Schema(implementation = ErrorResponse.class), mediaType = "application/json")),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access for non-approved events", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Access denied for non-admins requesting non-approved events", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     @GetMapping
@@ -86,6 +93,8 @@ public class EventController {
             @RequestParam(required = false) String location,
             @Parameter(description = "Search text for filtering events", example = "technology")
             @RequestParam(required = false) String searchText,
+            @Parameter(description = "Status of the event to filter by. Defaults to 'approved'.", example = "approved")
+            @RequestParam(required = false) EventStatus status,
             @Parameter(description = "Page number (zero-based)", example = "0")
             @RequestParam(defaultValue = "0") @Min(0) int page,
             @Parameter(description = "Number of records per page", example = "10")
@@ -95,6 +104,13 @@ public class EventController {
             @Parameter(description = "Sorting direction: 'asc' or 'desc'", example = "asc")
             @RequestParam(required = false) @Pattern(regexp = "^(asc|desc)?$", message = "Sorting direction must be 'asc' or 'desc'") String sortDirection
     ) {
+        if (status != null && status != EventStatus.APPROVED) {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication == null || !authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
+                throw new AccessDeniedException("Only admin can access events with status: " + status);
+            }
+        }
+
         Pageable pageable = PageRequest.of(page, size);
         if (sortField != null && !sortField.isEmpty()) {
             Sort sorting = Sort.unsorted();
@@ -106,13 +122,16 @@ public class EventController {
             pageable = PageRequest.of(page, size, sorting);
         }
 
-        Page<Event> events = eventService.getFilteredEvents(startDate,
+        EventFilters eventFilters = new EventFilters(startDate,
                 endDate,
                 eventType,
                 organizationName,
                 location,
                 searchText,
+                status != null ? status : EventStatus.APPROVED,
                 pageable);
+
+        Page<Event> events = eventService.getFilteredEvents(eventFilters);
 
         return ResponseEntity.ok(eventTranslator.translateToPaginatedResponse(events));
     }
@@ -131,7 +150,7 @@ public class EventController {
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     @GetMapping(path = "/{eventId}")
-    public ResponseEntity<Event> getOneById(@PathVariable @Parameter(description = "ID of the event to retrieve") int eventId) {
+    public ResponseEntity<Event> getOneById(@PathVariable @Parameter(description = "ID of the event to retrieve") long eventId) {
         return ResponseEntity.ok(eventService.getEventById(eventId));
     }
 
@@ -149,7 +168,6 @@ public class EventController {
             @ApiResponse(responseCode = "403", description = "Forbidden access", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<Event> createNewEvent(@Valid @RequestBody @Parameter(description = "Details of the event to create") EventRequest eventRequest) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -181,7 +199,7 @@ public class EventController {
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping(path = "/{eventId}")
     public ResponseEntity<Event> updateEvent(
-            @PathVariable @Parameter(description = "ID of the event to update") int eventId,
+            @PathVariable @Parameter(description = "ID of the event to update") long eventId,
             @Valid @RequestBody @Parameter(description = "Updated details of the event") EventRequest request) {
         return ResponseEntity.ok(eventService.updateEvent(eventId, request));
     }
@@ -202,9 +220,40 @@ public class EventController {
     })
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping(path = "/{eventId}")
-    public ResponseEntity<Void> deleteEvent(@PathVariable @Parameter(description = "ID of the event to delete") int eventId) {
+    public ResponseEntity<Void> deleteEvent(@PathVariable @Parameter(description = "ID of the event to delete") long eventId) {
         eventService.deleteEvent(eventId);
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "Approve event by ID", description = "Approve an event. Only administrators can approve events.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Event approved successfully", content = {@Content(schema = @Schema(implementation = Event.class), mediaType = "application/json")}),
+            @ApiResponse(responseCode = "400", description = "Event is already approved", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Forbidden access", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Event not found", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
+    })
+    @PreAuthorize("hasRole('ADMIN')")
+    @PatchMapping(path = "/{eventId}/approve")
+    public ResponseEntity<Event> approveEvent(@PathVariable long eventId) {
+        Event approvedEvent = eventService.approveEvent(eventId);
+        return ResponseEntity.ok(approvedEvent);
+    }
+
+    @Operation(summary = "Reject event by ID", description = "Reject an event by its ID. Only administrators can reject events.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Event rejected successfully", content = {@Content(schema = @Schema(implementation = Event.class), mediaType = "application/json")}),
+            @ApiResponse(responseCode = "401", description = "Unauthorized access", content = @Content),
+            @ApiResponse(responseCode = "403", description = "Forbidden access", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Event not found", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Invalid event status", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
+    })
+    @PreAuthorize("hasRole('ADMIN')")
+    @PatchMapping(path = "/{eventId}/reject")
+    public ResponseEntity<Event> rejectEvent(
+            @PathVariable @Parameter(description = "ID of the event to reject") long eventId) {
+        Event rejectedEvent = eventService.rejectEvent(eventId);
+        return ResponseEntity.ok(rejectedEvent);
+    }
 }
