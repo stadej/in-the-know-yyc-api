@@ -12,7 +12,7 @@ import java.util.Optional;
  * Extends JpaRepository to provide CRUD operations.
  */
 @Repository
-public interface EventRepository extends JpaRepository<Event, Integer>, EventRepositoryCustom {
+public interface EventRepository extends JpaRepository<Event, Long>, EventRepositoryCustom {
 
     /**
      * Finds an Event by its ID.
@@ -21,6 +21,6 @@ public interface EventRepository extends JpaRepository<Event, Integer>, EventRep
      * @return an Optional containing the found Event, or empty if not found
      */
     @Query("SELECT event FROM Event event WHERE event.id=?1")
-    Optional<Event> findEventById(int eventId);
+    Optional<Event> findEventById(long eventId);
 
 }

@@ -27,7 +27,7 @@ public class Event implements Serializable {
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private long id;
 
     /**
      * Name of the organization hosting the event.
@@ -128,6 +128,10 @@ public class Event implements Serializable {
     @Column(name = "speakers", columnDefinition = "TEXT")
     @Convert(converter = SpeakersConverter.class)
     private List<EventRequest.Speaker> speakers;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private EventStatus status;
 
     /**
      * Name of event image file in cloud storage
