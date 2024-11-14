@@ -138,9 +138,6 @@ public class EventService {
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format(EVENT_NOT_FOUND_BY_ID, eventId)));
 
-        if (event.getStatus() == EventStatus.APPROVED) {
-            throw new BadRequestException("Cannot reject an already approved event.");
-        }
         if (event.getStatus() == EventStatus.REJECTED) {
             throw new BadRequestException("Event is already rejected.");
         }

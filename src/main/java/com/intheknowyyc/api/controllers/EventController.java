@@ -105,11 +105,15 @@ public class EventController {
             @Parameter(description = "Sorting direction: 'asc' or 'desc'", example = "asc")
             @RequestParam(required = false) @Pattern(regexp = "^(asc|desc)?$", message = "Sorting direction must be 'asc' or 'desc'") String sortDirection
     ) {
-        if (status != null && status != EventStatus.APPROVED) {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication == null || !authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))) {
-                throw new AccessDeniedException("Only admin can access events with status: " + status);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean isAdmin = authentication != null && authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
+
+        if (status == null) {
+            if (!isAdmin) {
+                status = EventStatus.APPROVED;
             }
+        } else if (status != EventStatus.APPROVED && !isAdmin) {
+            throw new AccessDeniedException("Only admin can access events with status: " + status);
         }
 
         Pageable pageable = PageRequest.of(page, size);
@@ -129,7 +133,7 @@ public class EventController {
                 organizationName,
                 location,
                 searchText,
-                status != null ? status : EventStatus.APPROVED,
+                status,
                 pageable);
 
         Page<Event> events = eventService.getFilteredEvents(eventFilters);
