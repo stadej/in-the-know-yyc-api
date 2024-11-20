@@ -64,6 +64,7 @@ public class SecurityConfig {
                                         .requestMatchers(HttpMethod.POST,"/subscribe", "/subscribe/**").permitAll()
                                         .requestMatchers(HttpMethod.GET, "/comments*", "/comments/**").permitAll()
                                         .requestMatchers(HttpMethod.POST,"/cms/login").permitAll()
+                                        .requestMatchers(HttpMethod.GET, "/files*", "/files/**").permitAll()
                                         .anyRequest()
                                         .authenticated())
                 .httpBasic(withDefaults())
