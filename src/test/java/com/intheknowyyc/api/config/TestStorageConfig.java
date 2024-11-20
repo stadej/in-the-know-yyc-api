@@ -1,19 +1,19 @@
 package com.intheknowyyc.api.config;
 
-import com.amazonaws.services.s3.AmazonS3;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
+import software.amazon.awssdk.services.s3.S3Client;
 
 @TestConfiguration
-@Profile("test")
+@Profile({"test", "integrationTest"})
 public class TestStorageConfig {
 
     @Bean
     @Primary
-    public AmazonS3 mockS3Client() {
-        return Mockito.mock(AmazonS3.class);
+    public S3Client mockS3Client() {
+        return Mockito.mock(S3Client.class);
     }
 }

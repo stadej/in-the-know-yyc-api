@@ -6,7 +6,9 @@ import com.intheknowyyc.api.data.exceptions.ResourceNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.HttpClientErrorException;
@@ -20,10 +22,10 @@ public class SubscriptionService {
     @Value("${mailchimp_url}")
     private String url;
 
-    @Value("${app.mailchimp.api.key}")
+    @Value("${mailchimp_api_key}")
     private String apiKey;
 
-    @Value("${app.mailchimp.list.id}")
+    @Value("${mailchimp_list_id}")
     private String listId;
 
     private final RestTemplate restTemplate;

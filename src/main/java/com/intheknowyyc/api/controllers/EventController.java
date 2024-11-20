@@ -47,12 +47,10 @@ import java.time.LocalDateTime;
 public class EventController {
 
     private final EventService eventService;
-    private final EventTranslator eventTranslator;
 
     @Autowired
-    public EventController(EventService eventService, EventTranslator eventTranslator) {
+    public EventController(EventService eventService) {
         this.eventService = eventService;
-        this.eventTranslator = eventTranslator;
     }
 
     /**
@@ -138,7 +136,7 @@ public class EventController {
 
         Page<Event> events = eventService.getFilteredEvents(eventFilters);
 
-        return ResponseEntity.ok(eventTranslator.translateToPaginatedResponse(events));
+        return ResponseEntity.ok(EventTranslator.translateToPaginatedResponse(events));
     }
 
     /**
@@ -165,7 +163,7 @@ public class EventController {
      * @param eventRequest the event to create
      */
     @Operation(summary = "Create a new event",
-            description = "Create a new event. Only administrators can create events.")
+            description = "Create a new event. Administrators create events with 'APPROVED' status, while users create events with 'PENDING' status.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Event created successfully", content = {@Content(schema = @Schema(implementation = Event.class), mediaType = "application/json")}),
             @ApiResponse(responseCode = "400", description = "Invalid input data", content = @Content),
@@ -178,7 +176,7 @@ public class EventController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         Event createdEvent = eventService.createNewEvent(
-                eventTranslator.translateToEvent(eventRequest),
+                EventTranslator.translateToEvent(eventRequest),
                 (User) authentication.getPrincipal()
         );
 
@@ -206,7 +204,7 @@ public class EventController {
     public ResponseEntity<Event> updateEvent(
             @PathVariable @Parameter(description = "ID of the event to update") long eventId,
             @Valid @RequestBody @Parameter(description = "Updated details of the event") EventRequest request) {
-        return ResponseEntity.ok(eventService.updateEvent(eventId, request));
+        return ResponseEntity.ok(eventService.updateEvent(eventId, EventTranslator.translateToEvent(request)));
     }
 
     /**

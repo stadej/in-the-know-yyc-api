@@ -59,9 +59,9 @@
 			<optional>true</optional>
 		</dependency>
 		<dependency>
-			<groupId>com.amazonaws</groupId>
-			<artifactId>aws-java-sdk-s3</artifactId>
-			<version>1.12.773</version>
+			<groupId>software.amazon.awssdk</groupId>
+			<artifactId>s3</artifactId>
+			<version>2.20.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.amazonaws.secretsmanager</groupId>
@@ -89,6 +89,11 @@
 			<artifactId>jjwt-jackson</artifactId>
 			<version>0.12.6</version>
 			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.17.0</version>
 		</dependency>
 
 		<dependency>

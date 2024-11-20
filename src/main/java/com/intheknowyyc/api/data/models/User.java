@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -61,15 +63,11 @@ public class User implements Serializable, UserDetails {
     @NotBlank(message = "Please provide a full name")
     private String fullName;
 
-    /**
-     * The timestamp when the user was created.
-     */
+    @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    /**
-     * The timestamp when the user was last updated.
-     */
+    @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
@@ -82,13 +80,14 @@ public class User implements Serializable, UserDetails {
      * This is an enumeration that can be either ADMIN or USER.
      */
     @Enumerated(EnumType.STRING)
-    private UserRole role;
+    private UserRole role = UserRole.ROLE_USER;
 
     /**
      * Returns the authorities of the user.
      * @return The authorities of the user.
      */
     @Override
+    @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singletonList(new SimpleGrantedAuthority(role.name()));
     }

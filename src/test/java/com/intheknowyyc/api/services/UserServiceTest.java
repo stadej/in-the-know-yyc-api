@@ -1,10 +1,12 @@
 package com.intheknowyyc.api.services;
 
 import com.intheknowyyc.api.controllers.requests.UserRequest;
+import com.intheknowyyc.api.data.exceptions.BadRequestException;
 import com.intheknowyyc.api.data.exceptions.UserNotFoundException;
 import com.intheknowyyc.api.data.models.User;
 import com.intheknowyyc.api.data.models.UserRole;
 import com.intheknowyyc.api.data.repositories.UserRepository;
+import com.intheknowyyc.api.data.translators.UserTranslator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockitoAnnotations;
@@ -108,8 +110,8 @@ class UserServiceTest {
         UserRequest request = new UserRequest("test@example.com", "password", "Test User");
         when(userRepository.findUserByEmail("test@example.com")).thenReturn(Optional.of(user));
 
-        Exception exception = assertThrows(IllegalStateException.class, () -> {
-            userService.registerNewUser(request);
+        Exception exception = assertThrows(BadRequestException.class, () -> {
+            userService.registerNewUser(UserTranslator.translateToUser(request, 0));
         });
 
         assertEquals("User with this email already exists.", exception.getMessage());
@@ -118,10 +120,15 @@ class UserServiceTest {
 
     @Test
     void testRegisterNewUser_Success() {
-        UserRequest request = new UserRequest("newuser@example.com", "password", "New User");
+        User userR = new User();
+        userR.setId(1);
+        userR.setEmail("newuser@example.com");
+        userR.setPassword("password");
+        userR.setFullName("New User");
         when(userRepository.findUserByEmail("newuser@example.com")).thenReturn(Optional.empty());
+        when(userRepository.save(userR)).thenReturn(userR);
 
-        User newUser = userService.registerNewUser(request);
+        User newUser = userService.registerNewUser(userR);
 
         assertNotNull(newUser);
         assertEquals("newuser@example.com", newUser.getEmail());
@@ -132,15 +139,19 @@ class UserServiceTest {
 
     @Test
     void testUpdateUser_Success() {
-        UserRequest request = new UserRequest("updated@example.com", "newpassword", "Updated User");
+        User userR = new User();
+        userR.setId(1);
+        userR.setEmail("updated@example.com");
+        userR.setPassword("newpassword");
+        userR.setFullName("Updated User");
         when(userRepository.findById(1)).thenReturn(Optional.of(user));
+        when(userRepository.save(userR)).thenReturn(userR);
 
-        User updatedUser = userService.updateUser(1, request);
+        User updatedUser = userService.updateUser(userR);
 
         assertNotNull(updatedUser);
         assertEquals("updated@example.com", updatedUser.getEmail());
         assertEquals("Updated User", updatedUser.getFullName());
-        verify(userRepository, times(1)).findById(1);
     }
 
     @Test
