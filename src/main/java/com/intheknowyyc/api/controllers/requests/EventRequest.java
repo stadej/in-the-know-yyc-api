@@ -3,7 +3,9 @@ package com.intheknowyyc.api.controllers.requests;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -33,7 +35,7 @@ public class EventRequest {
 
     // The is_event_free field is annotated with @NotNull to ensure that the event cost is provided.
     @NotNull(message = "Please confirm if the event is free")
-    private boolean freeEvent;
+    private Boolean freeEvent;
 
     // The event_cost field.
     @Digits(integer = 10, fraction = 2)
@@ -57,6 +59,8 @@ public class EventRequest {
     private String eventImage;
 
     @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
     public static class Speaker {
         @NotBlank(message = "Please provide the speaker's name")
         private String name;

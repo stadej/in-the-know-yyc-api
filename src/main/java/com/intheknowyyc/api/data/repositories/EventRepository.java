@@ -2,7 +2,6 @@ package com.intheknowyyc.api.data.repositories;
 
 import com.intheknowyyc.api.data.models.Event;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -20,7 +19,6 @@ public interface EventRepository extends JpaRepository<Event, Long>, EventReposi
      * @param eventId the ID of the event
      * @return an Optional containing the found Event, or empty if not found
      */
-    @Query("SELECT event FROM Event event WHERE event.id=?1")
     Optional<Event> findEventById(long eventId);
 
 }

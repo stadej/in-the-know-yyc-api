@@ -6,6 +6,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -81,7 +83,7 @@ public class Event implements Serializable {
      */
     @Column(name = "is_event_free")
     @NotNull
-    private boolean freeEvent;
+    private Boolean freeEvent = true;
 
     /**
      * Cost of the event.
@@ -144,12 +146,14 @@ public class Event implements Serializable {
     /**
      * Timestamp when the event was created.
      */
+    @CreationTimestamp
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     /**
      * Timestamp when the event was last updated.
      */
+    @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 

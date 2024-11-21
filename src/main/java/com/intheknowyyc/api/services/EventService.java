@@ -1,6 +1,5 @@
 package com.intheknowyyc.api.services;
 
-import com.intheknowyyc.api.controllers.requests.EventRequest;
 import com.intheknowyyc.api.data.exceptions.BadRequestException;
 import com.intheknowyyc.api.data.exceptions.ResourceNotFoundException;
 import com.intheknowyyc.api.data.models.Event;
@@ -14,9 +13,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 import static com.intheknowyyc.api.utils.Constants.EVENT_NOT_FOUND_BY_ID;
 
@@ -67,18 +63,10 @@ public class EventService {
      */
     public Event createNewEvent(@Valid Event event, User user) {
 
-        if (event.isFreeEvent() && event.getEventCost().compareTo(BigDecimal.ZERO) != 0) {
-            throw new BadRequestException("Event cost must be zero for free events.");
-        } else if (!event.isFreeEvent() && event.getEventCost().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new BadRequestException("Event cost must be greater than zero for paid events.");
-        }
-
         boolean isAdmin = user.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
         event.setStatus(isAdmin ? EventStatus.APPROVED : EventStatus.PENDING);
 
         event.setUser(user);
-        event.setCreatedAt(LocalDateTime.now());
-        event.setUpdatedAt(LocalDateTime.now());
         return eventRepository.save(event);
     }
 
@@ -86,27 +74,51 @@ public class EventService {
      * Updates an existing event with the provided details.
      *
      * @param eventId      the ID of the event to update
-     * @param eventRequest the new event data
+     * @param updatedEvent the new event data
      */
-    public Event updateEvent(long eventId, EventRequest eventRequest) {
-        return eventRepository.findById(eventId).map(event -> {
-            event.setOrganizationName(eventRequest.getOrganizationName());
-            event.setEventName(eventRequest.getEventName());
-            event.setEventDescription(eventRequest.getEventDescription());
-            event.setEventDate(eventRequest.getEventDate());
-            event.setFreeEvent(eventRequest.isFreeEvent());
-            event.setEventCost(eventRequest.getEventCost());
-            if (event.isFreeEvent() && event.getEventCost().compareTo(BigDecimal.ZERO) != 0) {
-                throw new BadRequestException("Event cost must be zero for free events.");
-            } else if (!event.isFreeEvent() && event.getEventCost().compareTo(BigDecimal.ZERO) <= 0) {
-                throw new BadRequestException("Event cost must be greater than zero for paid events.");
-            }
-            event.setEventLink(eventRequest.getEventLink());
-            event.setEventType(eventRequest.getEventType());
-            event.setEventImage(eventRequest.getEventImage());
-            event.setUpdatedAt(LocalDateTime.now());
-            return eventRepository.save(event);
-        }).orElseThrow(() -> new ResourceNotFoundException(String.format(EVENT_NOT_FOUND_BY_ID, eventId)));
+    public Event updateEvent(long eventId, Event updatedEvent) {
+        Event existingEvent = eventRepository.findById(eventId)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format(EVENT_NOT_FOUND_BY_ID, eventId)));
+
+        if (updatedEvent.getOrganizationName() != null) {
+            existingEvent.setOrganizationName(updatedEvent.getOrganizationName());
+        }
+        if (updatedEvent.getEventName() != null) {
+            existingEvent.setEventName(updatedEvent.getEventName());
+        }
+        if (updatedEvent.getEventDescription() != null) {
+            existingEvent.setEventDescription(updatedEvent.getEventDescription());
+        }
+        if (updatedEvent.getEventDate() != null) {
+            existingEvent.setEventDate(updatedEvent.getEventDate());
+        }
+        if (updatedEvent.getFreeEvent() != null) {
+            existingEvent.setFreeEvent(updatedEvent.getFreeEvent());
+        }
+        if (updatedEvent.getEventCost() != null) {
+            existingEvent.setEventCost(updatedEvent.getEventCost());
+        }
+
+        if (updatedEvent.getEventLink() != null) {
+            existingEvent.setEventLink(updatedEvent.getEventLink());
+        }
+        if (updatedEvent.getEventType() != null) {
+            existingEvent.setEventType(updatedEvent.getEventType());
+        }
+        if (updatedEvent.getEventImage() != null) {
+            existingEvent.setEventImage(updatedEvent.getEventImage());
+        }
+        if (updatedEvent.getLocation() != null) {
+            existingEvent.setLocation(updatedEvent.getLocation());
+        }
+        if (updatedEvent.getIndustry() != null) {
+            existingEvent.setIndustry(updatedEvent.getIndustry());
+        }
+        if (updatedEvent.getSpeakers() != null) {
+            existingEvent.setSpeakers(updatedEvent.getSpeakers());
+        }
+
+        return eventRepository.save(existingEvent);
     }
 
     /**

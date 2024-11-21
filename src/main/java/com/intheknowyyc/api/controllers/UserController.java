@@ -2,6 +2,7 @@ package com.intheknowyyc.api.controllers;
 
 import com.intheknowyyc.api.controllers.requests.UserRequest;
 import com.intheknowyyc.api.data.models.User;
+import com.intheknowyyc.api.data.translators.UserTranslator;
 import com.intheknowyyc.api.services.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -113,7 +114,8 @@ public class UserController {
     })
     @PostMapping
     public ResponseEntity<User> createNewUser(@Valid @RequestBody @Parameter(description = "User registration data") UserRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(userService.registerNewUser(request));
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(userService.registerNewUser(UserTranslator.translateToUser(request, 0)));
     }
 
     /**
@@ -138,7 +140,8 @@ public class UserController {
             @PathVariable("userId") @Parameter(description = "ID of the user to be updated") int userId,
             @Valid @RequestBody @Parameter(description = "Updated user details") UserRequest request
     ) {
-        return ResponseEntity.ok(userService.updateUser(userId, request));
+        return ResponseEntity
+                .ok(userService.updateUser(UserTranslator.translateToUser(request, userId)));
     }
 
 }
