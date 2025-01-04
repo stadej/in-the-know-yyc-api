@@ -7,12 +7,17 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.io.IOException;
+
 
 /**
  * Controller for handling login requests.
@@ -43,6 +48,27 @@ public class LoginController {
     @PostMapping("/cms/login")
     public ResponseEntity<LoginResponse> login(@RequestBody @Valid LoginRequest request) {
         return loginService.login(request);
+    }
+
+    /**
+     * Endpoint for logging out a user.
+     *
+     * @param request the HTTP request
+     * @param response the HTTP response
+     * @throws IOException if an error occurs while logging out
+     */
+    @Operation(summary = "Refresh access token",
+            description = "Refresh JWT access token using refresh token.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Body contains accessToken and refreshToken.", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
+    })
+    @PostMapping("/cms/refresh-token")
+    public void refreshToken(
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) throws IOException {
+        loginService.refreshToken(request, response);
     }
 
 }
