@@ -15,9 +15,11 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -34,10 +36,13 @@ public class SecurityConfig {
 
     private final JWTAuthenticationFilter jwtAuthenticationFilter;
 
+    private final LogoutHandler logoutHandler;
+
     @Autowired
-    public SecurityConfig(UserService userService, JWTAuthenticationFilter jwtAuthenticationFilter) {
+    public SecurityConfig(UserService userService, JWTAuthenticationFilter jwtAuthenticationFilter, LogoutHandler logoutHandler) {
         this.userService = userService;
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+        this.logoutHandler = logoutHandler;
     }
 
     /**
@@ -63,13 +68,20 @@ public class SecurityConfig {
                                         .requestMatchers(HttpMethod.GET, "/events*", "/events/**").permitAll()
                                         .requestMatchers(HttpMethod.POST,"/subscribe", "/subscribe/**").permitAll()
                                         .requestMatchers(HttpMethod.GET, "/comments*", "/comments/**").permitAll()
-                                        .requestMatchers(HttpMethod.POST,"/cms/login").permitAll()
+                                        .requestMatchers(HttpMethod.POST,"/cms/login", "/cms/logout").permitAll()
                                         .requestMatchers(HttpMethod.GET, "/files*", "/files/**").permitAll()
                                         .anyRequest()
                                         .authenticated())
                 .httpBasic(withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .logout(logout ->
+                        logout.logoutUrl("/cms/logout")
+                                .deleteCookies("accessToken", "refreshToken")
+                                .invalidateHttpSession(true)
+                                .clearAuthentication(true)
+                                .addLogoutHandler(logoutHandler)
+                                .logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext()))
                 .build();
     }
 

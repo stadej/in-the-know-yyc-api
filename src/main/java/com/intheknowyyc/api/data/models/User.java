@@ -75,6 +75,12 @@ public class User implements Serializable, UserDetails {
 
     private boolean expired;
 
+    @OneToOne(
+            mappedBy = "user",
+            cascade = CascadeType.ALL
+    )
+    private RefreshToken refreshToken;
+
     /**
      * The role of the user.
      * This is an enumeration that can be either ADMIN or USER.
