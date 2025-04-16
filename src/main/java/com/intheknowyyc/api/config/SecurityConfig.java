@@ -59,7 +59,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "http://intheknowyyc.ca"));
         configuration.setAllowedMethods(Arrays.asList("*"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -113,7 +113,7 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setUserDetailsService(userService);
-        provider.setPasswordEncoder(new BCryptPasswordEncoder(4));
+        provider.setPasswordEncoder(passwordEncoder());
 
         AuthenticationManagerBuilder authenticationManagerBuilder = 
             http.getSharedObject(AuthenticationManagerBuilder.class);
@@ -121,13 +121,18 @@ public class SecurityConfig {
         return authenticationManagerBuilder.build();
     }
 
-    // in-memory credentials for testing
-    @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-      auth.inMemoryAuthentication()
-              .passwordEncoder(new BCryptPasswordEncoder(4))
-              .withUser("user1")
-              .password(new BCryptPasswordEncoder(4).encode("password"))
-              .authorities("ROLE_ADMIN");
+    @Bean
+    public BCryptPasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
+
+    // in-memory credentials for testing
+    // @Autowired
+    // public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+    //   auth.inMemoryAuthentication()
+    //           .passwordEncoder(new BCryptPasswordEncoder(4))
+    //           .withUser("user1")
+    //           .password(new BCryptPasswordEncoder(4).encode("password"))
+    //           .authorities("ROLE_ADMIN");
+    // }
 }

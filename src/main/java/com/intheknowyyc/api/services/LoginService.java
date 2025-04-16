@@ -53,8 +53,8 @@ public class LoginService {
         LoginResponse response = new LoginResponse();
 
         try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
+            this.authenticationManager.authenticate(
+                    UsernamePasswordAuthenticationToken.unauthenticated(
                             request.getEmail(),
                             request.getPassword()
                     )
