@@ -63,7 +63,7 @@ class EventRepositoryCustomIntegrationTest {
     void shouldFilterByEventType() {
         Pageable pageable = PageRequest.of(0, 10);
         Page<Event> result = eventRepository.findFilteredEvents(
-                null, null, "Conference", null, null, null, pageable, null);
+                null, null, "Conference", null, null, null, null, null, pageable, null);
 
         assertEquals(1, result.getTotalElements());
         assertEquals(event1.getEventName(), result.getContent().get(0).getEventName());
@@ -73,7 +73,7 @@ class EventRepositoryCustomIntegrationTest {
     void shouldFilterByOrganizationName() {
         Pageable pageable = PageRequest.of(0, 10);
         Page<Event> result = eventRepository.findFilteredEvents(
-                null, null, null, "Health Org", null, null, pageable, EventStatus.PENDING);
+                null, null, null, null, null, "Health Org", null, null, pageable, EventStatus.PENDING);
 
         assertEquals(1, result.getTotalElements());
         assertEquals(event2.getEventName(), result.getContent().get(0).getEventName());
@@ -86,7 +86,7 @@ class EventRepositoryCustomIntegrationTest {
 
         Pageable pageable = PageRequest.of(0, 10);
         Page<Event> result = eventRepository.findFilteredEvents(
-                startDate, endDate, null, null, null, null, pageable, null);
+                startDate, endDate, null, null, null,  null, null, null, pageable, null);
 
         assertEquals(1, result.getTotalElements());
         assertEquals(event1.getEventName(), result.getContent().get(0).getEventName());
@@ -96,7 +96,7 @@ class EventRepositoryCustomIntegrationTest {
     void shouldFilterByLocation() {
         Pageable pageable = PageRequest.of(0, 10);
         Page<Event> result = eventRepository.findFilteredEvents(
-                null, null, null, null, "Health Center", null, pageable, null);
+                null, null, null, null, null, null, "Health Center", null, pageable, null);
 
         assertEquals(1, result.getTotalElements());
         assertEquals(event2.getEventName(), result.getContent().get(0).getEventName());
@@ -106,7 +106,7 @@ class EventRepositoryCustomIntegrationTest {
     void shouldFilterBySearchText() {
         Pageable pageable = PageRequest.of(0, 10);
         Page<Event> result = eventRepository.findFilteredEvents(
-                null, null, null, null, null, "wellness", pageable, null);
+                null, null, null, null, null, null, null, "wellness", pageable, null);
 
         assertEquals(1, result.getTotalElements());
         assertEquals(event2.getEventName(), result.getContent().get(0).getEventName());
@@ -116,7 +116,7 @@ class EventRepositoryCustomIntegrationTest {
     void shouldFilterByStatus() {
         Pageable pageable = PageRequest.of(0, 10);
         Page<Event> result = eventRepository.findFilteredEvents(
-                null, null, null, null, null, null, pageable, EventStatus.APPROVED);
+                null, null, null, null, null, null, null, null,  pageable, EventStatus.APPROVED);
 
         assertEquals(1, result.getTotalElements());
     }
@@ -125,7 +125,7 @@ class EventRepositoryCustomIntegrationTest {
     void shouldFilterByMultipleParameters() {
         Pageable pageable = PageRequest.of(0, 10);
         Page<Event> result = eventRepository.findFilteredEvents(
-                null, null, "Conference", "Tech Org", "Tech City", null, pageable, EventStatus.APPROVED);
+                null, null, "Conference", null, null, "Tech Org", "Tech City", null,  pageable, EventStatus.APPROVED);
 
         assertEquals(1, result.getTotalElements());
         assertEquals(event1.getEventName(), result.getContent().get(0).getEventName());
@@ -136,7 +136,7 @@ class EventRepositoryCustomIntegrationTest {
         Pageable pageable = PageRequest.of(0, 10);
         Page<Event> result = eventRepository.findFilteredEvents(
                 LocalDateTime.now().plusDays(100), LocalDateTime.now().plusDays(200),
-                "Nonexistent Type", "Nonexistent Org", "Nowhere", "No match", pageable, EventStatus.REJECTED);
+                "Nonexistent Type", null, null, "Nonexistent Org", "Nowhere", "No match", pageable, EventStatus.REJECTED);
 
         assertTrue(result.isEmpty());
     }

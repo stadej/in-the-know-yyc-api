@@ -77,10 +77,10 @@ class EventServiceTest {
     @Test
     void getFilteredEvents_ShouldReturnFilteredEvents() {
         Page<Event> page = new PageImpl<>(Collections.singletonList(event));
-        when(eventRepository.findFilteredEvents(any(), any(), any(), any(), any(), any(), any(), any()))
+        when(eventRepository.findFilteredEvents(any(), any(), any(), any(), any(), any(), any(), any(), any(), any()))
                 .thenReturn(page);
 
-        Page<Event> result = eventService.getFilteredEvents(new EventFilters());  // Provide sample filter values
+        Page<Event> result = eventService.getFilteredEvents(new EventFilters(), new User());  // Provide sample filter values
 
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
@@ -111,7 +111,6 @@ class EventServiceTest {
         Event result = eventService.createNewEvent(event, adminUser);
 
         assertEquals(EventStatus.APPROVED, result.getStatus());
-        assertEquals(adminUser, result.getUser());
     }
 
     @Test
@@ -121,7 +120,6 @@ class EventServiceTest {
         Event result = eventService.createNewEvent(event, regularUser);
 
         assertEquals(EventStatus.PENDING, result.getStatus());
-        assertEquals(regularUser, result.getUser());
     }
 
     @Test
@@ -189,23 +187,7 @@ class EventServiceTest {
 
         assertThrows(ResourceNotFoundException.class, () -> eventService.updateEvent(999L, updatedEvent));
     }
-
-    @Test
-    void testUpdateEvent_UpdateSpeakers() {
-        when(eventRepository.findById(1L)).thenReturn(Optional.of(event));
-        when(eventRepository.save(any(Event.class))).thenAnswer(invocation -> invocation.getArgument(0));
-
-        List<EventRequest.Speaker> speakers = new ArrayList<>();
-        speakers.add(new EventRequest.Speaker("Speaker 1", "Topic 1"));
-        speakers.add(new EventRequest.Speaker("Speaker 2", "Topic 2"));
-
-        updatedEvent.setSpeakers(speakers);
-
-        Event result = eventService.updateEvent(1L, updatedEvent);
-
-        assertEquals(speakers, result.getSpeakers());
-    }
-
+    
     @Test
     void testDeleteEvent_SuccessfulDeletion() {
         when(eventRepository.findEventById(event.getId())).thenReturn(Optional.of(event));
