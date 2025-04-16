@@ -106,7 +106,7 @@ class EventRepositoryCustomIntegrationTest {
     void shouldFilterBySearchText() {
         Pageable pageable = PageRequest.of(0, 10);
         Page<Event> result = eventRepository.findFilteredEvents(
-                null, null, null, null, null, null, null, "wellness", pageable, null);
+                null, null, null, null, null, null, null, "Health", pageable, null);
 
         assertEquals(1, result.getTotalElements());
         assertEquals(event2.getEventName(), result.getContent().get(0).getEventName());
