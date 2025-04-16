@@ -4,6 +4,7 @@ import com.intheknowyyc.api.controllers.requests.LoginRequest;
 import com.intheknowyyc.api.controllers.responses.LoginResponse;
 import com.intheknowyyc.api.services.LoginService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -12,9 +13,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
@@ -45,6 +44,7 @@ public class LoginController {
             @ApiResponse(responseCode = "401", description = "Login failed.", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
+    @CrossOrigin(origins= {"http://localhost:3000"}, allowCredentials = "true" )
     @PostMapping("/cms/login")
     public ResponseEntity<LoginResponse> login(@RequestBody @Valid LoginRequest request) {
         return loginService.login(request);
@@ -61,14 +61,12 @@ public class LoginController {
             description = "Refresh JWT access token using refresh token.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Body contains accessToken and refreshToken.", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Could not refresh token", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     @PostMapping("/cms/refresh-token")
-    public void refreshToken(
-            HttpServletRequest request,
-            HttpServletResponse response
-    ) throws IOException {
-        loginService.refreshToken(request, response);
+    public ResponseEntity<LoginResponse> refreshToken(@Parameter(description = "Refresh Token") @RequestParam(required = true) String token) throws IOException {
+        return loginService.refreshToken(token);
     }
 
 }

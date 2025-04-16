@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 
+// import com.intheknowyyc.api.config.filter.SecurityConfig;
+
 /**
  * Service class for handling user login.
  */
@@ -57,6 +59,7 @@ public class LoginService {
                             request.getPassword()
                     )
             );
+
             var accessToken = jwtService.generateAccessToken(request.getEmail());
             var refreshToken = jwtService.generateRefreshToken(request.getEmail());
             User user = userRepository.findUserByEmail(request.getEmail()).orElseThrow();
@@ -75,39 +78,28 @@ public class LoginService {
     /**
      * Refreshes the access token using the refresh token.
      *
-     * @param request the HTTP request
-     * @param response the HTTP response
+     * @param token the refresh token
      * @throws IOException if an error occurs while refreshing the token
      */
-    public void refreshToken(
-            HttpServletRequest request,
-            HttpServletResponse response
-    ) throws IOException {
-        String header = request.getHeader(HttpHeaders.AUTHORIZATION);
-        String refreshToken;
-        String email;
-        if (header != null && header.startsWith("Bearer ")) {
-            refreshToken = header.substring(7);
-            email = jwtService.getEmailFromToken(refreshToken);
-        } else {
-            throw new IllegalArgumentException("Invalid refresh token");
-        }
+    public ResponseEntity<LoginResponse> refreshToken(String token) throws IOException {
+        LoginResponse authResponse = new LoginResponse();
+        String email = jwtService.getEmailFromToken(token);
 
-        if (email != null && refreshTokenRepository.findByToken(refreshToken).isPresent()) {
-            var user = userRepository.findUserByEmail(email)
-                    .orElseThrow();
-            if (jwtService.validateRefreshToken(refreshToken, user)) {
+        if (email != null && refreshTokenRepository.findByToken(token).isPresent()) {
+            var user = userRepository.findUserByEmail(email).orElseThrow();
+            if (jwtService.validateRefreshToken(token, user)) {
                 var accessToken = jwtService.generateAccessToken(email);
-                LoginResponse authResponse = new LoginResponse();
                 authResponse.setAccessToken(accessToken);
-                authResponse.setRefreshToken(refreshToken);
+                authResponse.setRefreshToken(token);
 
-                new ObjectMapper().writeValue(response.getOutputStream(), authResponse);
+                return ResponseEntity.ok(authResponse);
             } else {
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid refresh token");
+                authResponse.setError("Could not Refresh Token");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(authResponse);
             }
         } else {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid refresh token");
+            authResponse.setError("Could not Refresh Token");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(authResponse);
         }
     }
 

@@ -3,13 +3,10 @@ package com.intheknowyyc.api.controllers.requests;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * Request object for creating a new event.
@@ -30,8 +27,10 @@ public class EventRequest {
     private String eventDescription;
 
     // The event_date field is annotated with @NotNull to ensure that the event date is provided.
-    @NotNull(message = "Please provide an event date")
+    @NotNull(message = "Please provide an event start time")
     private LocalDateTime eventDate;
+
+    private LocalDateTime eventEndTime;
 
     // The is_event_free field is annotated with @NotNull to ensure that the event cost is provided.
     @NotNull(message = "Please confirm if the event is free")
@@ -49,23 +48,12 @@ public class EventRequest {
     @NotBlank(message = "Please provide an event type")
     private String eventType;
 
-    @NotBlank(message = "Please provide a location")
+    @NotNull(message = "Please confirm if the event is online")
+    private Boolean onlineEvent = false;
+
     private String location;
 
     private String industry;
 
-    private List<Speaker> speakers;
-
     private String eventImage;
-
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class Speaker {
-        @NotBlank(message = "Please provide the speaker's name")
-        private String name;
-
-        @NotBlank(message = "Please provide the company of the speaker")
-        private String company;
-    }
 }

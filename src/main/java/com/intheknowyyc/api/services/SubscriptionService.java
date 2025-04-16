@@ -50,8 +50,10 @@ public class SubscriptionService {
 
         subscriptionRequest.setStatus("pending");
         String link = url + "/lists/" + listId + "/members";
+        // String link = "https://us8.api.mailchimp.com/3.0/lists/a8afc9b6a1/members";
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "apikey " + apiKey);
+        // headers.set("Authorization", "apikey 52d235aaac6c918d9e605f9bc22c4011-us8");
         HttpEntity<SubscriptionRequest> requestEntity = new HttpEntity<>(subscriptionRequest, headers);
         try {
             return restTemplate.exchange(link, HttpMethod.POST, requestEntity, String.class).getBody();

@@ -27,7 +27,7 @@ public class EventRepositoryCustomImpl implements EventRepositoryCustom {
     private EntityManager entityManager;
 
     @Override
-    public Page<Event> findFilteredEvents(LocalDateTime startDate, LocalDateTime endDate, String eventType, String organizationName, String location, String searchText, Pageable pageable, EventStatus status) {
+    public Page<Event> findFilteredEvents(LocalDateTime startDate, LocalDateTime endDate, String eventType, String industry, Boolean freeEvent, String organizationName, String location, String searchText, Pageable pageable, EventStatus status) {
         StringBuilder sql = new StringBuilder("SELECT * FROM events e WHERE 1=1");
         StringBuilder sqlConditions = new StringBuilder();
         Map<String, Object> parameters = new HashMap<>();
@@ -36,6 +36,8 @@ public class EventRepositoryCustomImpl implements EventRepositoryCustom {
         appendConditionIfNotNull(sqlConditions, "e.event_date >= :startDate", startDate, "startDate", parameters);
         appendConditionIfNotNull(sqlConditions, "e.event_date <= :endDate", endDate, "endDate", parameters);
         appendConditionIfNotEmpty(sqlConditions, "e.event_type = :eventType", eventType, "eventType", parameters);
+        appendConditionIfNotEmpty(sqlConditions, "e.industry = :industry", industry, "industry", parameters);
+        appendConditionIfNotNull(sqlConditions, "e.is_event_free = :freeEvent", freeEvent, "freeEvent", parameters);
         appendConditionIfNotEmpty(sqlConditions, "e.location = :location", location, "location", parameters);
         appendConditionIfNotEmpty(sqlConditions, "e.organization_name = :organizationName", organizationName, "organizationName", parameters);
         appendSearchCondition(sqlConditions, searchText, parameters);
@@ -75,7 +77,7 @@ public class EventRepositoryCustomImpl implements EventRepositoryCustom {
 
     private void appendSearchCondition(StringBuilder sqlConditions, String searchText, Map<String, Object> parameters) {
         if (searchText != null && !searchText.isEmpty()) {
-            sqlConditions.append(" AND (LOWER(e.event_name) LIKE :searchText OR LOWER(e.event_description) LIKE :searchText OR LOWER(e.organization_name) LIKE :searchText)");
+            sqlConditions.append(" AND (LOWER(e.event_name) LIKE :searchText OR LOWER(e.organization_name) LIKE :searchText)");
             parameters.put("searchText", "%" + searchText.toLowerCase() + "%");
         }
     }

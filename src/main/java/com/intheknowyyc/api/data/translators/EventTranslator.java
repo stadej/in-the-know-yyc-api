@@ -16,14 +16,15 @@ public class EventTranslator {
         event.setEventName(eventRequest.getEventName());
         event.setEventDescription(eventRequest.getEventDescription());
         event.setEventDate(eventRequest.getEventDate());
+        event.setEventEndTime(eventRequest.getEventEndTime());
         event.setFreeEvent(eventRequest.getFreeEvent());
         event.setEventCost(eventRequest.getEventCost());
         event.setEventLink(eventRequest.getEventLink());
         event.setEventType(eventRequest.getEventType());
         event.setEventImage(eventRequest.getEventImage());
+        event.setOnlineEvent(eventRequest.getOnlineEvent());
         event.setLocation(eventRequest.getLocation());
         event.setIndustry(eventRequest.getIndustry());
-        event.setSpeakers(eventRequest.getSpeakers());
         return event;
     }
 

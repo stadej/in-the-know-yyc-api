@@ -94,7 +94,7 @@ public class JWTService {
 
         Map<String, Objects> claims = new HashMap<>();
 
-        return buildToken(email, claims, 7 * 24 * 60 * 60 * 1000);
+        return buildToken(email, claims, 24 * 60 * 60 * 1000);
     }
 
     /**
@@ -211,7 +211,7 @@ public class JWTService {
         RefreshToken token = new RefreshToken(
                 refreshToken,
                 Instant.now(),
-                Instant.now().plusMillis(7 * 24 * 60 * 60 * 1000),
+                Instant.now().plusMillis(24 * 60 * 60 * 1000),
                 user
         );
         refreshTokenRepository.save(token);

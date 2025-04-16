@@ -29,7 +29,7 @@ import java.util.List;
 @RestController
 @RequestMapping(path = "/users")
 @Tag(name = "User Controller", description = "API for managing users")
-@SecurityRequirement(name = "swagger-auth")
+@SecurityRequirement(name = "bearer-auth")
 public class UserController {
 
     private final UserService userService;

@@ -1,7 +1,6 @@
 package com.intheknowyyc.api.data.models;
 
 import com.intheknowyyc.api.controllers.requests.EventRequest;
-import com.intheknowyyc.api.data.converters.SpeakersConverter;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -69,7 +68,7 @@ public class Event implements Serializable {
     private String eventDescription;
 
     /**
-     * Date and time when the event will take place.
+     * Date and time when the event will take start.
      * Cannot be null.
      */
     @Column(
@@ -77,6 +76,12 @@ public class Event implements Serializable {
             nullable = false
     )
     private LocalDateTime eventDate;
+
+        /**
+     * Date and time when the event will end.
+     */
+    @Column(name = "event_end_time")
+    private LocalDateTime eventEndTime;
 
     /**
      * Indicates whether the event is free.
@@ -120,16 +125,18 @@ public class Event implements Serializable {
     @NotBlank(message = "Please provide an event type")
     private String eventType;
 
-    @Column(name = "location", nullable = false)
-    @NotBlank(message = "Please provide an event location")
+        /**
+     * Indicates whether the event is online.
+     */
+    @Column(name = "is_event_online")
+    @NotNull
+    private Boolean onlineEvent = false;
+
+    @Column(name = "location")
     private String location;
 
     @Column(name = "industry")
     private String industry;
-
-    @Column(name = "speakers", columnDefinition = "TEXT")
-    @Convert(converter = SpeakersConverter.class)
-    private List<EventRequest.Speaker> speakers;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -156,12 +163,4 @@ public class Event implements Serializable {
     @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
-
-    /**
-     * User who created the event.
-     * Many-to-one relationship with the User entity.
-     */
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
 }

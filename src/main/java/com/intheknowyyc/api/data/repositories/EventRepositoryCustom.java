@@ -11,6 +11,8 @@ public interface EventRepositoryCustom {
     Page<Event> findFilteredEvents(LocalDateTime startDate,
                                    LocalDateTime endDate,
                                    String eventType,
+                                   String industry, 
+                                   Boolean freeEvent,
                                    String organizationName,
                                    String location,
                                    String searchText,

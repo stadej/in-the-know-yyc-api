@@ -1,12 +1,14 @@
 package com.intheknowyyc.api.controllers;
 
 import com.intheknowyyc.api.controllers.requests.EventRequest;
+import com.intheknowyyc.api.controllers.requests.SubscriptionRequest;
 import com.intheknowyyc.api.controllers.responses.ErrorResponse;
 import com.intheknowyyc.api.controllers.responses.PaginatedEventResponse;
 import com.intheknowyyc.api.data.models.Event;
 import com.intheknowyyc.api.data.models.EventFilters;
 import com.intheknowyyc.api.data.models.EventStatus;
 import com.intheknowyyc.api.data.models.User;
+import com.intheknowyyc.api.data.models.UserRole;
 import com.intheknowyyc.api.data.translators.EventTranslator;
 import com.intheknowyyc.api.services.EventService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -43,7 +45,7 @@ import java.time.LocalDateTime;
 @RestController
 @RequestMapping(path = "/events")
 @Tag(name = "Event Controller", description = "API for managing events")
-@SecurityRequirement(name = "swagger-auth")
+@SecurityRequirement(name = "bearer-auth")
 public class EventController {
 
     private final EventService eventService;
@@ -86,6 +88,10 @@ public class EventController {
             @RequestParam(required = false) LocalDateTime endDate,
             @Parameter(description = "Type of the event", example = "conference")
             @RequestParam(required = false) String eventType,
+            @Parameter(description = "Industry of the event", example = "Tech")
+            @RequestParam(required = false) String industry,
+            @Parameter(description = "Is event free", example = "true")
+            @RequestParam(required = false) Boolean freeEvent,
             @Parameter(description = "Organization name", example = "TechOrg")
             @RequestParam(required = false) String organizationName,
             @Parameter(description = "Location", example = "Calgary")
@@ -104,15 +110,6 @@ public class EventController {
             @RequestParam(required = false) @Pattern(regexp = "^(asc|desc)?$", message = "Sorting direction must be 'asc' or 'desc'") String sortDirection
     ) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        boolean isAdmin = authentication != null && authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
-
-        if (status == null) {
-            if (!isAdmin) {
-                status = EventStatus.APPROVED;
-            }
-        } else if (status != EventStatus.APPROVED && !isAdmin) {
-            throw new AccessDeniedException("Only admin can access events with status: " + status);
-        }
 
         Pageable pageable = PageRequest.of(page, size);
         if (sortField != null && !sortField.isEmpty()) {
@@ -128,13 +125,22 @@ public class EventController {
         EventFilters eventFilters = new EventFilters(startDate,
                 endDate,
                 eventType,
+                industry,
+                freeEvent,
                 organizationName,
                 location,
                 searchText,
                 status,
                 pageable);
 
-        Page<Event> events = eventService.getFilteredEvents(eventFilters);
+        User user = new User();
+        user.setRole(UserRole.ROLE_USER);
+
+        if(authentication.getPrincipal().getClass().getCanonicalName() == "com.intheknowyyc.api.data.models.User"){
+                user = (User) authentication.getPrincipal();
+        }
+
+        Page<Event> events = eventService.getFilteredEvents(eventFilters, user);
 
         return ResponseEntity.ok(EventTranslator.translateToPaginatedResponse(events));
     }
@@ -177,6 +183,9 @@ public class EventController {
 
         Event createdEvent = eventService.createNewEvent(
                 EventTranslator.translateToEvent(eventRequest),
+                // removed for testing
+                // new User()
+                
                 (User) authentication.getPrincipal()
         );
 
