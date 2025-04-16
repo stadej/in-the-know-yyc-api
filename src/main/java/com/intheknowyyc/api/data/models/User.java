@@ -48,7 +48,6 @@ public class User implements Serializable, UserDetails {
      * The hashed password of the user.
      * This field is mandatory.
      */
-    @JsonIgnore
     @Column(nullable = false)
     @NotBlank(message = "Please provide a password")
     private String password;
@@ -86,7 +85,7 @@ public class User implements Serializable, UserDetails {
      * This is an enumeration that can be either ADMIN or USER.
      */
     @Enumerated(EnumType.STRING)
-    private UserRole role = UserRole.ROLE_USER;
+    private UserRole role = UserRole.ROLE_ADMIN;
 
     /**
      * Returns the authorities of the user.

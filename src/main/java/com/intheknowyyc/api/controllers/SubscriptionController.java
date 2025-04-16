@@ -1,9 +1,12 @@
 package com.intheknowyyc.api.controllers;
 
 import com.intheknowyyc.api.controllers.requests.SubscriptionRequest;
+import com.intheknowyyc.api.data.models.Event;
 import com.intheknowyyc.api.services.SubscriptionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
@@ -27,7 +30,7 @@ public class SubscriptionController {
     @Operation(summary = "Create new subscriptions",
             description = "Registers a new subscriber with email.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Email subscribed successfully.", content = @Content),
+            @ApiResponse(responseCode = "200", description = "Email subscribed successfully.", content = {@Content(schema = @Schema(implementation = SubscriptionRequest.class), mediaType = "application/json")}),
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
             @ApiResponse(responseCode = "404", description = "Resource not found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)

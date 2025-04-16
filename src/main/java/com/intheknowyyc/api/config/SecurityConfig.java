@@ -6,9 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -16,12 +20,19 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import static org.springframework.security.config.Customizer.withDefaults;
+
+import java.util.Arrays;
 
 /**
  * Configuration class for Spring Security.
@@ -45,6 +56,17 @@ public class SecurityConfig {
         this.logoutHandler = logoutHandler;
     }
 
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
+        configuration.setAllowedMethods(Arrays.asList("*"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
     /**
      * Defines the security filter chain.
      * Disables CSRF protection, allows GET and POST requests for all users,
@@ -59,6 +81,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
+                .cors(c -> c.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(
                         authorize ->
                                 authorize
@@ -68,7 +91,7 @@ public class SecurityConfig {
                                         .requestMatchers(HttpMethod.GET, "/events*", "/events/**").permitAll()
                                         .requestMatchers(HttpMethod.POST,"/subscribe", "/subscribe/**").permitAll()
                                         .requestMatchers(HttpMethod.GET, "/comments*", "/comments/**").permitAll()
-                                        .requestMatchers(HttpMethod.POST,"/cms/login", "/cms/logout").permitAll()
+                                        .requestMatchers(HttpMethod.POST,"/cms/login", "/cms/refresh-token", "/cms/logout").permitAll()
                                         .requestMatchers(HttpMethod.GET, "/files*", "/files/**").permitAll()
                                         .anyRequest()
                                         .authenticated())
@@ -85,23 +108,26 @@ public class SecurityConfig {
                 .build();
     }
 
-    /**
-     * Configures the authentication provider.
-     *
-     * @return the configured authentication provider
-     */
+    // This is required to make the AuthenticationManager available as a bean
     @Bean
-    public AuthenticationProvider authenticationProvider() {
+    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setUserDetailsService(userService);
         provider.setPasswordEncoder(new BCryptPasswordEncoder(4));
-        return provider;
+
+        AuthenticationManagerBuilder authenticationManagerBuilder = 
+            http.getSharedObject(AuthenticationManagerBuilder.class);
+        authenticationManagerBuilder.authenticationProvider(provider);
+        return authenticationManagerBuilder.build();
     }
 
-    // This is required to make the AuthenticationManager available as a bean
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
+    // in-memory credentials for testing
+    @Autowired
+    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+      auth.inMemoryAuthentication()
+              .passwordEncoder(new BCryptPasswordEncoder(4))
+              .withUser("user1")
+              .password(new BCryptPasswordEncoder(4).encode("password"))
+              .authorities("ROLE_ADMIN");
     }
-
 }

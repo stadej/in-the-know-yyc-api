@@ -2,11 +2,13 @@ package com.intheknowyyc.api.services;
 
 import com.intheknowyyc.api.data.exceptions.BadRequestException;
 import com.intheknowyyc.api.data.exceptions.ResourceNotFoundException;
+import com.intheknowyyc.api.data.exceptions.UserNotFoundException;
 import com.intheknowyyc.api.data.models.Event;
 import com.intheknowyyc.api.data.models.EventFilters;
 import com.intheknowyyc.api.data.models.EventStatus;
 import com.intheknowyyc.api.data.models.User;
 import com.intheknowyyc.api.data.repositories.EventRepository;
+import com.intheknowyyc.api.data.repositories.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -14,6 +16,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.intheknowyyc.api.utils.Constants.USER_NOT_FOUND_BY_EMAIL;
 import static com.intheknowyyc.api.utils.Constants.EVENT_NOT_FOUND_BY_ID;
 
 /**
@@ -25,18 +28,24 @@ import static com.intheknowyyc.api.utils.Constants.EVENT_NOT_FOUND_BY_ID;
 public class EventService {
 
     private final EventRepository eventRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public EventService(EventRepository eventRepository) {
+    public EventService(EventRepository eventRepository, UserRepository userRepository) {
         this.eventRepository = eventRepository;
+        this.userRepository = userRepository;
     }
 
-    public Page<Event> getFilteredEvents(
-            EventFilters eventFilters
-    ) {
+    public Page<Event> getFilteredEvents(EventFilters eventFilters, User user) {
+        boolean isAdmin = user.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
+        if(!isAdmin){
+            eventFilters.setStatus(EventStatus.APPROVED);
+        }
         return eventRepository.findFilteredEvents(eventFilters.getStartDate(),
                 eventFilters.getEndDate(),
                 eventFilters.getEventType(),
+                eventFilters.getIndustry(),
+                eventFilters.getFreeEvent(),
                 eventFilters.getOrganizationName(),
                 eventFilters.getLocation(),
                 eventFilters.getSearchText(),
@@ -65,8 +74,10 @@ public class EventService {
 
         boolean isAdmin = user.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"));
         event.setStatus(isAdmin ? EventStatus.APPROVED : EventStatus.PENDING);
+        // event.setStatus(EventStatus.APPROVED);
 
-        event.setUser(user);
+        // for testing purposes
+        // user = userRepository.findUserByEmail("newadmin1@email.com").orElseThrow(() -> new UserNotFoundException(String.format(USER_NOT_FOUND_BY_EMAIL, "newadmin1@email.com")));;
         return eventRepository.save(event);
     }
 
@@ -92,6 +103,9 @@ public class EventService {
         if (updatedEvent.getEventDate() != null) {
             existingEvent.setEventDate(updatedEvent.getEventDate());
         }
+        if (updatedEvent.getEventEndTime() != null) {
+            existingEvent.setEventEndTime(updatedEvent.getEventEndTime());
+        }
         if (updatedEvent.getFreeEvent() != null) {
             existingEvent.setFreeEvent(updatedEvent.getFreeEvent());
         }
@@ -108,14 +122,14 @@ public class EventService {
         if (updatedEvent.getEventImage() != null) {
             existingEvent.setEventImage(updatedEvent.getEventImage());
         }
+        if (updatedEvent.getOnlineEvent() != null) {
+            existingEvent.setOnlineEvent(updatedEvent.getOnlineEvent());
+        }
         if (updatedEvent.getLocation() != null) {
             existingEvent.setLocation(updatedEvent.getLocation());
         }
         if (updatedEvent.getIndustry() != null) {
             existingEvent.setIndustry(updatedEvent.getIndustry());
-        }
-        if (updatedEvent.getSpeakers() != null) {
-            existingEvent.setSpeakers(updatedEvent.getSpeakers());
         }
 
         return eventRepository.save(existingEvent);
