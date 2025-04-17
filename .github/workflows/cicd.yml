@@ -24,7 +24,7 @@ jobs:
         if: endsWith(github.ref, '/develop')
         run: |
           echo 'env: dev'
-          echo  "SELF_HOSTED_RUNNER=aws-ec2-dev" >> $GITHUB_ENV
+          echo  "SELF_HOSTED_RUNNER=self-hosted" >> $GITHUB_ENV
           echo  "NAME=dev" >> $GITHUB_ENV          
           echo  "PORT=${{ vars.PORT_DEV }}" >> $GITHUB_ENV
           echo  "DB_URL=${{ vars.DB_URL_DEV }}" >> $GITHUB_ENV
@@ -42,7 +42,7 @@ jobs:
         if: ${{ !endsWith(github.ref, '/prod') && !endsWith(github.ref, '/develop') }}
         run: |
           echo 'env: test'
-          echo  "SELF_HOSTED_RUNNER=aws-ec2-dev" >> $GITHUB_ENV
+          echo  "SELF_HOSTED_RUNNER=self-hosted" >> $GITHUB_ENV
           echo  "NAME=test" >> $GITHUB_ENV
           echo  "PORT=9999" >> $GITHUB_ENV
           echo  "DB_URL=${{ vars.DB_URL_DEV }}" >> $GITHUB_ENV
